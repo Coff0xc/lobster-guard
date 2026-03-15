@@ -1,0 +1,28 @@
+id: openclaw-hooks-no-auth
+info:
+  name: OpenClaw Hooks Endpoint No Authentication
+  author: LobsterGuard
+  severity: high
+  description: OpenClaw webhook hooks endpoint accessible without token — allows injecting messages into agent sessions
+  tags: openclaw,misconfig,hooks
+
+http:
+  - method: POST
+    path:
+      - "{{BaseURL}}/hooks/agent"
+      - "{{BaseURL}}/hooks/wake"
+      - "{{BaseURL}}/hooks"
+    headers:
+      Content-Type: application/json
+    body: '{"text":"probe"}'
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+          - 202
+      - type: word
+        negative: true
+        words:
+          - "unauthorized"
+          - "forbidden"

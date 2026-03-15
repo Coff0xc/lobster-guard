@@ -1,0 +1,18 @@
+id: openclaw-ws-no-auth
+info:
+  name: OpenClaw WebSocket No Authentication
+  author: LobsterGuard
+  severity: critical
+  description: OpenClaw Gateway WebSocket accepts connections without authentication — full control plane access
+  tags: openclaw,misconfig,websocket
+
+websocket:
+  - address: "{{Host}}:{{Port}}"
+    inputs:
+      - data: '{"id":1,"method":"health"}'
+    matchers:
+      - type: word
+        words:
+          - '"result"'
+          - '"id":1'
+        condition: and

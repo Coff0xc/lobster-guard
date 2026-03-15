@@ -1,0 +1,29 @@
+id: openclaw-mattermost-command-inject
+
+info:
+  name: OpenClaw Mattermost Command Injection
+  author: lobster-guard
+  severity: high
+  description: Tests if Mattermost slash command endpoint accepts unsigned requests
+  tags: openclaw,mattermost,channel,injection
+
+http:
+  - method: POST
+    path:
+      - "{{BaseURL}}/api/channels/mattermost/command"
+    headers:
+      Content-Type: "application/x-www-form-urlencoded"
+    body: "token=openclaw&text=nuclei_probe&user_name=nuclei&command=%2Fopenclaw"
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+          - 201
+          - 202
+      - type: word
+        part: body
+        words:
+          - "text"
+          - "response"
+        condition: or

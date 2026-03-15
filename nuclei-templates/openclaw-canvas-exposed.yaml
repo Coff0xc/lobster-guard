@@ -1,0 +1,17 @@
+id: openclaw-canvas-exposed
+info:
+  name: OpenClaw Canvas/A2UI Exposed
+  author: LobsterGuard
+  severity: medium
+  description: OpenClaw Canvas or A2UI web interface is publicly accessible
+  tags: openclaw,misconfig,exposure
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/__openclaw__/canvas/"
+      - "{{BaseURL}}/__openclaw__/a2ui/"
+    matchers:
+      - type: status
+        status:
+          - 200

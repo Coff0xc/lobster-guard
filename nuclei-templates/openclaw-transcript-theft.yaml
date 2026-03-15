@@ -1,0 +1,47 @@
+id: openclaw-transcript-theft
+
+info:
+  name: OpenClaw Session Transcript Theft
+  author: lobster-guard
+  severity: high
+  description: Tests if sessions.get returns unredacted conversation history including tool outputs containing secrets, file contents, and command results
+  tags: openclaw,sessions,transcript,theft
+
+http:
+  - method: POST
+    path:
+      - "{{BaseURL}}/__openclaw__/a2ui/api/sessions/list"
+    headers:
+      Content-Type: "application/json"
+    body: '{}'
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: word
+        part: body
+        words:
+          - "sessionId"
+          - "key"
+          - "sessionKey"
+        condition: or
+
+  - method: POST
+    path:
+      - "{{BaseURL}}/__openclaw__/a2ui/api/sessions/get"
+    headers:
+      Content-Type: "application/json"
+    body: '{"limit":100}'
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: word
+        part: body
+        words:
+          - "messages"
+          - "transcript"
+          - "content"
+        condition: or

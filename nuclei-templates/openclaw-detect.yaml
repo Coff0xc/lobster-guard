@@ -1,0 +1,29 @@
+id: openclaw-detect
+info:
+  name: OpenClaw Gateway Detection
+  author: LobsterGuard
+  severity: info
+  description: Detects OpenClaw Gateway instances via health endpoint
+  tags: openclaw,detect,fingerprint
+  metadata:
+    shodan-query: port:18789
+    fofa-query: port="18789"
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/healthz"
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: word
+        part: header
+        words:
+          - "application/json"
+    extractors:
+      - type: json
+        json:
+          - ".version"
+        part: body

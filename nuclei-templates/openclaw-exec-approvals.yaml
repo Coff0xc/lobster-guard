@@ -1,0 +1,28 @@
+id: openclaw-exec-approvals-exposed
+
+info:
+  name: OpenClaw Exec Approvals Policy Exposed
+  author: lobster-guard
+  severity: high
+  description: Detects if exec approval policy is readable/writable — attacker can auto-approve all commands
+  tags: openclaw,exec,approval,policy
+
+http:
+  - method: POST
+    path:
+      - "{{BaseURL}}/__openclaw__/a2ui/api/exec/approvals"
+    headers:
+      Content-Type: "application/json"
+    body: '{}'
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: word
+        part: body
+        words:
+          - "allowAll"
+          - "approvals"
+          - "rules"
+        condition: or

@@ -1,0 +1,26 @@
+id: openclaw-browser-cdp-exposed
+
+info:
+  name: OpenClaw Browser CDP Exposed
+  author: lobster-guard
+  severity: high
+  description: Detects exposed Chrome DevTools Protocol endpoints from OpenClaw sandbox browser
+  tags: openclaw,browser,cdp,ssrf
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}:9222/json/version"
+      - "{{BaseURL}}:9222/json/list"
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: word
+        part: body
+        words:
+          - "webSocketDebuggerUrl"
+          - "Browser"
+          - "devtoolsFrontendUrl"
+        condition: or

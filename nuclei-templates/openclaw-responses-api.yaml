@@ -1,0 +1,31 @@
+id: openclaw-responses-endpoint
+
+info:
+  name: OpenClaw Responses API Endpoint Exposed
+  author: lobster-guard
+  severity: medium
+  description: Detects exposed /v1/responses endpoint (OpenAI Responses API compat)
+  tags: openclaw,api,responses
+
+http:
+  - method: POST
+    path:
+      - "{{BaseURL}}/v1/responses"
+    headers:
+      Content-Type: "application/json"
+    body: '{"model":"probe","input":"test"}'
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+          - 400
+          - 401
+      - type: word
+        part: body
+        words:
+          - "error"
+          - "model"
+          - "output"
+          - "response"
+        condition: or

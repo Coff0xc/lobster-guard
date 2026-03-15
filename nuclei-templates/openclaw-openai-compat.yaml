@@ -1,0 +1,23 @@
+id: openclaw-openai-compat
+info:
+  name: OpenClaw OpenAI Compatible API Endpoint
+  author: LobsterGuard
+  severity: info
+  description: Detects OpenClaw OpenAI-compatible API endpoints
+  tags: openclaw,detect,api
+
+http:
+  - method: POST
+    path:
+      - "{{BaseURL}}/v1/chat/completions"
+      - "{{BaseURL}}/v1/responses"
+    headers:
+      Content-Type: application/json
+    body: '{}'
+    matchers:
+      - type: status
+        status:
+          - 400
+          - 401
+          - 403
+          - 200

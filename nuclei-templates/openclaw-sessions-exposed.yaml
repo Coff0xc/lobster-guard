@@ -1,0 +1,29 @@
+id: openclaw-sessions-exposed
+
+info:
+  name: OpenClaw Sessions Data Exposed
+  author: lobster-guard
+  severity: medium
+  description: Detects if session data is accessible without proper auth — conversation history exposure
+  tags: openclaw,sessions,data,exposure
+
+http:
+  - method: POST
+    path:
+      - "{{BaseURL}}/__openclaw__/a2ui/api/sessions/list"
+    headers:
+      Content-Type: "application/json"
+    body: '{}'
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: word
+        part: body
+        words:
+          - "sessionId"
+          - "agentId"
+          - "transcript"
+          - "sessions"
+        condition: or

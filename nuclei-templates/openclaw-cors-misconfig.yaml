@@ -1,0 +1,24 @@
+id: openclaw-cors-misconfiguration
+
+info:
+  name: OpenClaw CORS Misconfiguration
+  author: lobster-guard
+  severity: high
+  description: Tests for CORS origin reflection on OpenClaw instances
+  tags: openclaw,cors,misconfiguration
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/healthz"
+    headers:
+      Origin: "https://evil.com"
+    matchers-condition: and
+    matchers:
+      - type: word
+        part: header
+        words:
+          - "Access-Control-Allow-Origin: https://evil.com"
+      - type: status
+        status:
+          - 200

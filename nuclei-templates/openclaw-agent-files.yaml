@@ -1,0 +1,28 @@
+id: openclaw-agent-files-exposed
+
+info:
+  name: OpenClaw Agent Files Exposed
+  author: lobster-guard
+  severity: medium
+  description: Detects if agent workspace files (CLAUDE.md, AGENTS.md) are readable via WS API
+  tags: openclaw,agent,files,prompt
+
+http:
+  - method: POST
+    path:
+      - "{{BaseURL}}/__openclaw__/a2ui/api/agents/files/list"
+    headers:
+      Content-Type: "application/json"
+    body: '{}'
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+      - type: word
+        part: body
+        words:
+          - "CLAUDE.md"
+          - "AGENTS.md"
+          - "IDENTITY.md"
+        condition: or

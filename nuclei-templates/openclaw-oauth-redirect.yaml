@@ -1,0 +1,27 @@
+id: openclaw-oauth-open-redirect
+
+info:
+  name: OpenClaw OAuth Open Redirect
+  author: lobster-guard
+  severity: medium
+  description: Tests for open redirect in Slack OAuth callback
+  tags: openclaw,oauth,redirect,slack
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/api/slack/oauth?redirect_uri=https://evil.com/callback"
+      - "{{BaseURL}}/api/slack/oauth/callback?redirect_uri=https://evil.com/callback"
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 301
+          - 302
+          - 303
+          - 307
+          - 308
+      - type: word
+        part: header
+        words:
+          - "evil.com"

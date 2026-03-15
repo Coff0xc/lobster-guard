@@ -1,0 +1,27 @@
+id: openclaw-discord-interactions
+
+info:
+  name: OpenClaw Discord Interactions Endpoint
+  author: lobster-guard
+  severity: medium
+  description: Detects exposed Discord interactions endpoint that may accept unsigned requests
+  tags: openclaw,discord,channel
+
+http:
+  - method: POST
+    path:
+      - "{{BaseURL}}/api/channels/discord/webhook"
+      - "{{BaseURL}}/api/discord/interactions"
+    headers:
+      Content-Type: "application/json"
+    body: '{"type":1}'
+    matchers-condition: and
+    matchers:
+      - type: status
+        status:
+          - 200
+          - 201
+      - type: word
+        part: body
+        words:
+          - "type"

