@@ -1,0 +1,509 @@
+[
+  {
+    "target": {
+      "Host": "34.85.0.184",
+      "Port": 443,
+      "UseTLS": true,
+      "Token": "",
+      "Password": ""
+    },
+    "findings": [
+      {
+        "target": "34.85.0.184:443",
+        "module": "fingerprint",
+        "title": "OpenClaw control-ui-config.json exposed",
+        "severity": 0,
+        "description": "/__openclaw/control-ui-config.json accessible (version: 2026.3.12)",
+        "evidence": "{\"basePath\":\"\",\"assistantName\":\"诸葛亮 (Kongming - Efficiency Mode)\",\"assistantAvatar\":\"📊\",\"assistantAgentId\":\"main\",\"serverVersion\":\"2026.3.12\"}",
+        "timestamp": "2026-03-16T11:07:23Z"
+      },
+      {
+        "target": "34.85.0.184:443",
+        "module": "fingerprint",
+        "title": "Canvas/A2UI path accessible: /__openclaw/canvas/",
+        "severity": 2,
+        "description": "/__openclaw/canvas/ returns 200 — web UI exposed",
+        "timestamp": "2026-03-16T11:07:24Z"
+      },
+      {
+        "target": "34.85.0.184:443",
+        "module": "fingerprint",
+        "title": "Canvas/A2UI path accessible: /__openclaw/a2ui/",
+        "severity": 2,
+        "description": "/__openclaw/a2ui/ returns 200 — web UI exposed",
+        "timestamp": "2026-03-16T11:07:24Z"
+      },
+      {
+        "target": "34.85.0.184:443",
+        "module": "auth",
+        "title": "Canvas/A2UI accessible without auth: /__openclaw/canvas/",
+        "severity": 0,
+        "description": "GET /__openclaw/canvas/ returns frontend SPA shell without auth — static assets only, no API data",
+        "evidence": "HTTP 200, body: \u003c!doctype html\u003e\n\u003chtml lang=\"en\"\u003e\n  \u003chead\u003e\n    \u003cmeta charset=\"UTF-8\" /\u003e\n    \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /\u003e\n  ...",
+        "timestamp": "2026-03-16T11:07:30Z"
+      },
+      {
+        "target": "34.85.0.184:443",
+        "module": "auth",
+        "title": "Canvas/A2UI accessible without auth: /__openclaw/a2ui/",
+        "severity": 0,
+        "description": "GET /__openclaw/a2ui/ returns frontend SPA shell without auth — static assets only, no API data",
+        "evidence": "HTTP 200, body: \u003c!doctype html\u003e\n\u003chtml lang=\"en\"\u003e\n  \u003chead\u003e\n    \u003cmeta charset=\"UTF-8\" /\u003e\n    \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /\u003e\n  ...",
+        "timestamp": "2026-03-16T11:07:31Z"
+      },
+      {
+        "target": "34.85.0.184:443",
+        "module": "auth",
+        "title": "Health endpoint exposes instance info",
+        "severity": 1,
+        "description": "GET /healthz returns instance metadata without auth",
+        "evidence": "{\"ok\":true,\"status\":\"live\"}",
+        "timestamp": "2026-03-16T11:07:31Z"
+      },
+      {
+        "target": "34.85.0.184:443",
+        "module": "recon",
+        "title": "WS challenge gate active — methods not enumerable without auth",
+        "severity": 0,
+        "description": "WebSocket connection requires challenge-response authentication. Method enumeration skipped to avoid false positives.",
+        "evidence": "Challenge nonce: 189a5027-4ff8-4f6a-8b46-cea69be131ff",
+        "timestamp": "2026-03-16T11:07:38Z"
+      }
+    ],
+    "start_at": "2026-03-16T19:07:18.4522269+08:00",
+    "end_at": "2026-03-16T19:09:08.7381388+08:00"
+  },
+  {
+    "target": {
+      "Host": "54.65.173.232",
+      "Port": 443,
+      "UseTLS": true,
+      "Token": "",
+      "Password": ""
+    },
+    "findings": [
+      {
+        "target": "54.65.173.232:443",
+        "module": "fingerprint",
+        "title": "OpenClaw control-ui-config.json exposed",
+        "severity": 0,
+        "description": "/__openclaw/control-ui-config.json accessible (version: 2026.3.11)",
+        "evidence": "{\"basePath\":\"\",\"assistantName\":\"小虾\",\"assistantAvatar\":\"A\",\"assistantAgentId\":\"main\",\"serverVersion\":\"2026.3.11\"}",
+        "timestamp": "2026-03-16T11:07:39Z"
+      },
+      {
+        "target": "54.65.173.232:443",
+        "module": "fingerprint",
+        "title": "Canvas/A2UI path accessible: /__openclaw/canvas/",
+        "severity": 2,
+        "description": "/__openclaw/canvas/ returns 200 — web UI exposed",
+        "timestamp": "2026-03-16T11:07:39Z"
+      },
+      {
+        "target": "54.65.173.232:443",
+        "module": "fingerprint",
+        "title": "Canvas/A2UI path accessible: /__openclaw/a2ui/",
+        "severity": 2,
+        "description": "/__openclaw/a2ui/ returns 200 — web UI exposed",
+        "timestamp": "2026-03-16T11:07:40Z"
+      },
+      {
+        "target": "54.65.173.232:443",
+        "module": "auth",
+        "title": "Canvas/A2UI accessible without auth: /__openclaw/canvas/",
+        "severity": 0,
+        "description": "GET /__openclaw/canvas/ returns frontend SPA shell without auth — static assets only, no API data",
+        "evidence": "HTTP 200, body: \u003c!doctype html\u003e\n\u003chtml lang=\"en\"\u003e\n  \u003chead\u003e\n    \u003cmeta charset=\"UTF-8\" /\u003e\n    \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /\u003e\n  ...",
+        "timestamp": "2026-03-16T11:07:42Z"
+      },
+      {
+        "target": "54.65.173.232:443",
+        "module": "auth",
+        "title": "Canvas/A2UI accessible without auth: /__openclaw/a2ui/",
+        "severity": 0,
+        "description": "GET /__openclaw/a2ui/ returns frontend SPA shell without auth — static assets only, no API data",
+        "evidence": "HTTP 200, body: \u003c!doctype html\u003e\n\u003chtml lang=\"en\"\u003e\n  \u003chead\u003e\n    \u003cmeta charset=\"UTF-8\" /\u003e\n    \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /\u003e\n  ...",
+        "timestamp": "2026-03-16T11:07:42Z"
+      },
+      {
+        "target": "54.65.173.232:443",
+        "module": "auth",
+        "title": "Health endpoint exposes instance info",
+        "severity": 1,
+        "description": "GET /healthz returns instance metadata without auth",
+        "evidence": "{\"ok\":true,\"status\":\"live\"}",
+        "timestamp": "2026-03-16T11:07:42Z"
+      }
+    ],
+    "start_at": "2026-03-16T19:07:38.5358392+08:00",
+    "end_at": "2026-03-16T19:09:08.7386429+08:00"
+  },
+  {
+    "target": {
+      "Host": "163.44.123.164",
+      "Port": 443,
+      "UseTLS": true,
+      "Token": "",
+      "Password": ""
+    },
+    "findings": [
+      {
+        "target": "163.44.123.164:443",
+        "module": "fingerprint",
+        "title": "OpenClaw control-ui-config.json exposed",
+        "severity": 0,
+        "description": "/__openclaw/control-ui-config.json accessible (version: )",
+        "evidence": "{\"basePath\":\"\",\"assistantName\":\"Dazai\",\"assistantAvatar\":\"📖\",\"assistantAgentId\":\"main\"}",
+        "timestamp": "2026-03-16T11:07:53Z"
+      },
+      {
+        "target": "163.44.123.164:443",
+        "module": "fingerprint",
+        "title": "Canvas/A2UI path accessible: /__openclaw/canvas/",
+        "severity": 2,
+        "description": "/__openclaw/canvas/ returns 200 — web UI exposed",
+        "timestamp": "2026-03-16T11:07:53Z"
+      },
+      {
+        "target": "163.44.123.164:443",
+        "module": "fingerprint",
+        "title": "Canvas/A2UI path accessible: /__openclaw/a2ui/",
+        "severity": 2,
+        "description": "/__openclaw/a2ui/ returns 200 — web UI exposed",
+        "timestamp": "2026-03-16T11:07:54Z"
+      },
+      {
+        "target": "163.44.123.164:443",
+        "module": "auth",
+        "title": "Canvas/A2UI accessible without auth: /__openclaw/canvas/",
+        "severity": 0,
+        "description": "GET /__openclaw/canvas/ returns frontend SPA shell without auth — static assets only, no API data",
+        "evidence": "HTTP 200, body: \u003c!doctype html\u003e\n\u003chtml lang=\"en\"\u003e\n  \u003chead\u003e\n    \u003cmeta charset=\"UTF-8\" /\u003e\n    \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /\u003e\n  ...",
+        "timestamp": "2026-03-16T11:07:56Z"
+      },
+      {
+        "target": "163.44.123.164:443",
+        "module": "auth",
+        "title": "Canvas/A2UI accessible without auth: /__openclaw/a2ui/",
+        "severity": 0,
+        "description": "GET /__openclaw/a2ui/ returns frontend SPA shell without auth — static assets only, no API data",
+        "evidence": "HTTP 200, body: \u003c!doctype html\u003e\n\u003chtml lang=\"en\"\u003e\n  \u003chead\u003e\n    \u003cmeta charset=\"UTF-8\" /\u003e\n    \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /\u003e\n  ...",
+        "timestamp": "2026-03-16T11:07:56Z"
+      },
+      {
+        "target": "163.44.123.164:443",
+        "module": "recon",
+        "title": "WS challenge gate active — methods not enumerable without auth",
+        "severity": 0,
+        "description": "WebSocket connection requires challenge-response authentication. Method enumeration skipped to avoid false positives.",
+        "evidence": "Challenge nonce: 48ff0b7b-0315-44c7-9bde-fabd860fca4f",
+        "timestamp": "2026-03-16T11:08:02Z"
+      }
+    ],
+    "start_at": "2026-03-16T19:07:52.071705+08:00",
+    "end_at": "2026-03-16T19:09:08.7386429+08:00"
+  },
+  {
+    "target": {
+      "Host": "43.207.117.200",
+      "Port": 443,
+      "UseTLS": true,
+      "Token": "",
+      "Password": ""
+    },
+    "findings": [
+      {
+        "target": "43.207.117.200:443",
+        "module": "fingerprint",
+        "title": "OpenClaw control-ui-config.json exposed",
+        "severity": 0,
+        "description": "/__openclaw/control-ui-config.json accessible (version: 2026.3.12)",
+        "evidence": "{\"basePath\":\"\",\"assistantName\":\"Assistant\",\"assistantAvatar\":\"A\",\"assistantAgentId\":\"main\",\"serverVersion\":\"2026.3.12\"}",
+        "timestamp": "2026-03-16T11:08:03Z"
+      },
+      {
+        "target": "43.207.117.200:443",
+        "module": "fingerprint",
+        "title": "Canvas/A2UI path accessible: /__openclaw/canvas/",
+        "severity": 2,
+        "description": "/__openclaw/canvas/ returns 200 — web UI exposed",
+        "timestamp": "2026-03-16T11:08:03Z"
+      },
+      {
+        "target": "43.207.117.200:443",
+        "module": "fingerprint",
+        "title": "Canvas/A2UI path accessible: /__openclaw/a2ui/",
+        "severity": 2,
+        "description": "/__openclaw/a2ui/ returns 200 — web UI exposed",
+        "timestamp": "2026-03-16T11:08:03Z"
+      },
+      {
+        "target": "43.207.117.200:443",
+        "module": "auth",
+        "title": "Canvas/A2UI accessible without auth: /__openclaw/canvas/",
+        "severity": 0,
+        "description": "GET /__openclaw/canvas/ returns frontend SPA shell without auth — static assets only, no API data",
+        "evidence": "HTTP 200, body: \u003c!doctype html\u003e\n\u003chtml lang=\"en\"\u003e\n  \u003chead\u003e\n    \u003cmeta charset=\"UTF-8\" /\u003e\n    \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /\u003e\n  ...",
+        "timestamp": "2026-03-16T11:08:09Z"
+      },
+      {
+        "target": "43.207.117.200:443",
+        "module": "auth",
+        "title": "Canvas/A2UI accessible without auth: /__openclaw/a2ui/",
+        "severity": 0,
+        "description": "GET /__openclaw/a2ui/ returns frontend SPA shell without auth — static assets only, no API data",
+        "evidence": "HTTP 200, body: \u003c!doctype html\u003e\n\u003chtml lang=\"en\"\u003e\n  \u003chead\u003e\n    \u003cmeta charset=\"UTF-8\" /\u003e\n    \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /\u003e\n  ...",
+        "timestamp": "2026-03-16T11:08:09Z"
+      },
+      {
+        "target": "43.207.117.200:443",
+        "module": "auth",
+        "title": "Health endpoint exposes instance info",
+        "severity": 1,
+        "description": "GET /healthz returns instance metadata without auth",
+        "evidence": "{\"ok\":true,\"status\":\"live\"}",
+        "timestamp": "2026-03-16T11:08:10Z"
+      },
+      {
+        "target": "43.207.117.200:443",
+        "module": "recon",
+        "title": "WS challenge gate active — methods not enumerable without auth",
+        "severity": 0,
+        "description": "WebSocket connection requires challenge-response authentication. Method enumeration skipped to avoid false positives.",
+        "evidence": "Challenge nonce: de851bce-46ad-4d95-a4fd-2cfe7416a383",
+        "timestamp": "2026-03-16T11:08:16Z"
+      }
+    ],
+    "start_at": "2026-03-16T19:08:02.4996197+08:00",
+    "end_at": "2026-03-16T19:09:08.7386429+08:00"
+  },
+  {
+    "target": {
+      "Host": "52.194.226.105",
+      "Port": 443,
+      "UseTLS": true,
+      "Token": "",
+      "Password": ""
+    },
+    "findings": [
+      {
+        "target": "52.194.226.105:443",
+        "module": "fingerprint",
+        "title": "OpenClaw control-ui-config.json exposed",
+        "severity": 0,
+        "description": "/__openclaw/control-ui-config.json accessible (version: )",
+        "evidence": "{\"basePath\":\"\",\"assistantName\":\"Assistant\",\"assistantAvatar\":\"A\",\"assistantAgentId\":\"main\"}",
+        "timestamp": "2026-03-16T11:08:17Z"
+      },
+      {
+        "target": "52.194.226.105:443",
+        "module": "fingerprint",
+        "title": "Canvas/A2UI path accessible: /__openclaw/canvas/",
+        "severity": 2,
+        "description": "/__openclaw/canvas/ returns 200 — web UI exposed",
+        "timestamp": "2026-03-16T11:08:18Z"
+      },
+      {
+        "target": "52.194.226.105:443",
+        "module": "fingerprint",
+        "title": "Canvas/A2UI path accessible: /__openclaw/a2ui/",
+        "severity": 2,
+        "description": "/__openclaw/a2ui/ returns 200 — web UI exposed",
+        "timestamp": "2026-03-16T11:08:18Z"
+      },
+      {
+        "target": "52.194.226.105:443",
+        "module": "auth",
+        "title": "Canvas/A2UI accessible without auth: /__openclaw/canvas/",
+        "severity": 0,
+        "description": "GET /__openclaw/canvas/ returns frontend SPA shell without auth — static assets only, no API data",
+        "evidence": "HTTP 200, body: \u003c!doctype html\u003e\n\u003chtml lang=\"en\"\u003e\n  \u003chead\u003e\n    \u003cmeta charset=\"UTF-8\" /\u003e\n    \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /\u003e\n  ...",
+        "timestamp": "2026-03-16T11:08:25Z"
+      },
+      {
+        "target": "52.194.226.105:443",
+        "module": "auth",
+        "title": "Canvas/A2UI accessible without auth: /__openclaw/a2ui/",
+        "severity": 0,
+        "description": "GET /__openclaw/a2ui/ returns frontend SPA shell without auth — static assets only, no API data",
+        "evidence": "HTTP 200, body: \u003c!doctype html\u003e\n\u003chtml lang=\"en\"\u003e\n  \u003chead\u003e\n    \u003cmeta charset=\"UTF-8\" /\u003e\n    \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /\u003e\n  ...",
+        "timestamp": "2026-03-16T11:08:26Z"
+      }
+    ],
+    "start_at": "2026-03-16T19:08:16.8991085+08:00",
+    "end_at": "2026-03-16T19:09:08.7386429+08:00"
+  },
+  {
+    "target": {
+      "Host": "45.32.55.78",
+      "Port": 443,
+      "UseTLS": true,
+      "Token": "",
+      "Password": ""
+    },
+    "findings": [
+      {
+        "target": "45.32.55.78:443",
+        "module": "fingerprint",
+        "title": "OpenClaw control-ui-config.json exposed",
+        "severity": 0,
+        "description": "/__openclaw/control-ui-config.json accessible (version: )",
+        "evidence": "\u003c!doctype html\u003e\n\u003chtml lang=\"en\"\u003e\n  \u003chead\u003e\n    \u003cmeta charset=\"UTF-8\" /\u003e\n    \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /\u003e\n    \u003ctitle\u003eOpenClaw Control\u003c/title\u003e\n    \u003cmeta name=\"color-scheme\" content=\"dark light\" /\u003e\n    \u003clink rel=\"icon\" type=\"image/svg+xml\" href=\"./favicon.svg\" /\u003e\n    \u003clink rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"./favicon-32.png\" /\u003e\n    \u003clink rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"./apple-touch-icon.png\" /\u003e\n    \u003cscript type=\"module\" crossorigin src=\"./assets/index-BtuoDTGq.js\"\u003e\u003c/script\u003e\n    \u003clink rel=\"stylesheet\" crossorigin href=\"./assets/index-B3tl1vnL.css\"\u003e\n  \u003cscript\u003ewindow.__OPENCLAW_CONTROL_UI_BASE_PATH__=\"\";window.__OPENCLAW_ASSISTANT_NAME__=\"Assistant\";window.__OPENCLAW_ASSISTANT_AVATAR__=\"A\";\u003c/script\u003e\u003c/head\u003e\n  \u003cbody\u003e\n    \u003copenclaw-app\u003e\u003c/openclaw-app\u003e\n  \u003c/body\u003e\n\u003c/html\u003e\n",
+        "timestamp": "2026-03-16T11:08:42Z"
+      },
+      {
+        "target": "45.32.55.78:443",
+        "module": "fingerprint",
+        "title": "Canvas/A2UI path accessible: /__openclaw/canvas/",
+        "severity": 2,
+        "description": "/__openclaw/canvas/ returns 200 — web UI exposed",
+        "timestamp": "2026-03-16T11:08:42Z"
+      },
+      {
+        "target": "45.32.55.78:443",
+        "module": "fingerprint",
+        "title": "Canvas/A2UI path accessible: /__openclaw__/canvas/",
+        "severity": 2,
+        "description": "/__openclaw__/canvas/ returns 200 — web UI exposed",
+        "timestamp": "2026-03-16T11:08:42Z"
+      },
+      {
+        "target": "45.32.55.78:443",
+        "module": "fingerprint",
+        "title": "Canvas/A2UI path accessible: /__openclaw/a2ui/",
+        "severity": 2,
+        "description": "/__openclaw/a2ui/ returns 200 — web UI exposed",
+        "timestamp": "2026-03-16T11:08:42Z"
+      },
+      {
+        "target": "45.32.55.78:443",
+        "module": "fingerprint",
+        "title": "Canvas/A2UI path accessible: /__openclaw__/a2ui/",
+        "severity": 2,
+        "description": "/__openclaw__/a2ui/ returns 200 — web UI exposed",
+        "timestamp": "2026-03-16T11:08:42Z"
+      },
+      {
+        "target": "45.32.55.78:443",
+        "module": "auth",
+        "title": "Canvas/A2UI accessible without auth: /__openclaw/canvas/",
+        "severity": 0,
+        "description": "GET /__openclaw/canvas/ returns frontend SPA shell without auth — static assets only, no API data",
+        "evidence": "HTTP 200, body: \u003c!doctype html\u003e\n\u003chtml lang=\"en\"\u003e\n  \u003chead\u003e\n    \u003cmeta charset=\"UTF-8\" /\u003e\n    \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /\u003e\n  ...",
+        "timestamp": "2026-03-16T11:08:44Z"
+      },
+      {
+        "target": "45.32.55.78:443",
+        "module": "auth",
+        "title": "Canvas/A2UI accessible without auth: /__openclaw__/canvas/",
+        "severity": 3,
+        "description": "GET /__openclaw__/canvas/ returns 200 without Bearer token — authenticated API path accessible without auth",
+        "evidence": "HTTP 200, body: \u003c!doctype html\u003e\n\u003cmeta charset=\"utf-8\" /\u003e\n\u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1\" /\u003e\n\u003ctitle\u003eOpenClaw Canvas\u003c/title\u003e\n\u003cstyle\u003e...",
+        "timestamp": "2026-03-16T11:08:44Z"
+      },
+      {
+        "target": "45.32.55.78:443",
+        "module": "auth",
+        "title": "Canvas/A2UI accessible without auth: /__openclaw/a2ui/",
+        "severity": 0,
+        "description": "GET /__openclaw/a2ui/ returns frontend SPA shell without auth — static assets only, no API data",
+        "evidence": "HTTP 200, body: \u003c!doctype html\u003e\n\u003chtml lang=\"en\"\u003e\n  \u003chead\u003e\n    \u003cmeta charset=\"UTF-8\" /\u003e\n    \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /\u003e\n  ...",
+        "timestamp": "2026-03-16T11:08:45Z"
+      },
+      {
+        "target": "45.32.55.78:443",
+        "module": "auth",
+        "title": "Canvas/A2UI accessible without auth: /__openclaw__/a2ui/",
+        "severity": 3,
+        "description": "GET /__openclaw__/a2ui/ returns 200 without Bearer token — authenticated API path accessible without auth",
+        "evidence": "HTTP 200, body: \u003c!doctype html\u003e\n\u003chtml\u003e\n  \u003chead\u003e\n    \u003cmeta charset=\"utf-8\" /\u003e\n    \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1\" /\u003e\n    \u003ctitle\u003eOpe...",
+        "timestamp": "2026-03-16T11:08:45Z"
+      },
+      {
+        "target": "45.32.55.78:443",
+        "module": "recon",
+        "title": "WS challenge gate active — methods not enumerable without auth",
+        "severity": 0,
+        "description": "WebSocket connection requires challenge-response authentication. Method enumeration skipped to avoid false positives.",
+        "evidence": "Challenge nonce: 83398c0f-2a05-4541-ab5f-ae1bcc7b1874",
+        "timestamp": "2026-03-16T11:08:50Z"
+      }
+    ],
+    "start_at": "2026-03-16T19:08:40.8369365+08:00",
+    "end_at": "2026-03-16T19:09:08.7386429+08:00"
+  },
+  {
+    "target": {
+      "Host": "8.216.33.182",
+      "Port": 443,
+      "UseTLS": true,
+      "Token": "",
+      "Password": ""
+    },
+    "findings": [
+      {
+        "target": "8.216.33.182:443",
+        "module": "fingerprint",
+        "title": "OpenClaw control-ui-config.json exposed",
+        "severity": 0,
+        "description": "/__openclaw/control-ui-config.json accessible (version: 2026.3.8)",
+        "evidence": "{\"basePath\":\"\",\"assistantName\":\"Assistant\",\"assistantAvatar\":\"A\",\"assistantAgentId\":\"main\",\"serverVersion\":\"2026.3.8\"}",
+        "timestamp": "2026-03-16T11:08:51Z"
+      },
+      {
+        "target": "8.216.33.182:443",
+        "module": "fingerprint",
+        "title": "Canvas/A2UI path accessible: /__openclaw/canvas/",
+        "severity": 2,
+        "description": "/__openclaw/canvas/ returns 200 — web UI exposed",
+        "timestamp": "2026-03-16T11:08:51Z"
+      },
+      {
+        "target": "8.216.33.182:443",
+        "module": "fingerprint",
+        "title": "Canvas/A2UI path accessible: /__openclaw/a2ui/",
+        "severity": 2,
+        "description": "/__openclaw/a2ui/ returns 200 — web UI exposed",
+        "timestamp": "2026-03-16T11:08:51Z"
+      },
+      {
+        "target": "8.216.33.182:443",
+        "module": "auth",
+        "title": "Canvas/A2UI accessible without auth: /__openclaw/canvas/",
+        "severity": 0,
+        "description": "GET /__openclaw/canvas/ returns frontend SPA shell without auth — static assets only, no API data",
+        "evidence": "HTTP 200, body: \u003c!doctype html\u003e\n\u003chtml lang=\"en\"\u003e\n  \u003chead\u003e\n    \u003cmeta charset=\"UTF-8\" /\u003e\n    \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /\u003e\n  ...",
+        "timestamp": "2026-03-16T11:08:54Z"
+      },
+      {
+        "target": "8.216.33.182:443",
+        "module": "auth",
+        "title": "Canvas/A2UI accessible without auth: /__openclaw/a2ui/",
+        "severity": 0,
+        "description": "GET /__openclaw/a2ui/ returns frontend SPA shell without auth — static assets only, no API data",
+        "evidence": "HTTP 200, body: \u003c!doctype html\u003e\n\u003chtml lang=\"en\"\u003e\n  \u003chead\u003e\n    \u003cmeta charset=\"UTF-8\" /\u003e\n    \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /\u003e\n  ...",
+        "timestamp": "2026-03-16T11:08:55Z"
+      },
+      {
+        "target": "8.216.33.182:443",
+        "module": "auth",
+        "title": "Health endpoint exposes instance info",
+        "severity": 1,
+        "description": "GET /healthz returns instance metadata without auth",
+        "evidence": "{\"ok\":true,\"status\":\"live\"}",
+        "timestamp": "2026-03-16T11:08:55Z"
+      },
+      {
+        "target": "8.216.33.182:443",
+        "module": "recon",
+        "title": "WS challenge gate active — methods not enumerable without auth",
+        "severity": 0,
+        "description": "WebSocket connection requires challenge-response authentication. Method enumeration skipped to avoid false positives.",
+        "evidence": "Challenge nonce: 6a962beb-419f-489d-bdd9-a298a9377d71",
+        "timestamp": "2026-03-16T11:09:08Z"
+      }
+    ],
+    "start_at": "2026-03-16T19:08:50.5374892+08:00",
+    "end_at": "2026-03-16T19:09:08.7391641+08:00"
+  }
+]

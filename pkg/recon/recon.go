@@ -10,6 +10,19 @@ import (
 	"github.com/coff0xc/lobster-guard/pkg/utils"
 )
 
+// isSPAFallback detects nginx SPA fallback responses — all unmatched routes
+// return 200 + text/html with the SPA shell. These are NOT real API endpoints.
+func isSPAFallback(body []byte, contentType string) bool {
+	if !strings.Contains(contentType, "text/html") {
+		return false
+	}
+	s := string(body)
+	return strings.Contains(s, "openclaw-app") ||
+		strings.Contains(s, "OPENCLAW_CONTROL_UI_BASE_PATH") ||
+		strings.Contains(s, "OpenClaw Control") ||
+		strings.Contains(s, "OpenClaw Canvas")
+}
+
 // EndpointResult holds endpoint enumeration results
 type EndpointResult struct {
 	Path   string `json:"path"`
@@ -78,9 +91,23 @@ func EnumEndpoints(target utils.Target, token string, timeout time.Duration) ([]
 		}
 
 		// First try without auth
-		status, _, _, err := utils.DoRequest(client, p.method, base+p.path, headers, bodyReader)
+		status, body, respHeaders, err := utils.DoRequest(client, p.method, base+p.path, headers, bodyReader)
 		if err != nil {
 			continue
+		}
+
+		// Detect SPA fallback — nginx returns 200 + HTML for all unmatched routes
+		ct := ""
+		if respHeaders != nil {
+			ct = respHeaders.Get("Content-Type")
+		}
+		if status == 200 && isSPAFallback(body, ct) {
+			// Check if this is a known SPA path (canvas/a2ui) — those are expected
+			isSPAPath := strings.Contains(p.path, "/canvas") || strings.Contains(p.path, "/a2ui")
+			if !isSPAPath {
+				// Not a real endpoint — SPA fallback, skip
+				continue
+			}
 		}
 
 		authStatus := "unknown"

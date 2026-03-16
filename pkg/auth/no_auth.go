@@ -71,16 +71,42 @@ func NoAuthCheck(target utils.Target, timeout time.Duration) []utils.Finding {
 		}
 		if status == 200 {
 			isDoubleUnderscore := strings.Contains(path, "__openclaw__")
+			// Check if response is just static HTML (SPA shell) vs actual API data
+			bodyStr := string(body)
+			isStaticSPA := strings.Contains(bodyStr, "<!doctype html") || strings.Contains(bodyStr, "<html") ||
+				strings.Contains(bodyStr, "openclaw-app") || strings.Contains(bodyStr, "OPENCLAW_CONTROL_UI_BASE_PATH")
+
+			// SPA fallback detection: if double-underscore path returns SPA HTML,
+			// it's nginx fallback, NOT a real unauthenticated API endpoint.
+			// Verify by checking a random sub-path — if it also returns 200+HTML, it's fallback.
+			if isDoubleUnderscore && isStaticSPA {
+				// Probe a random path under the same prefix to confirm SPA fallback
+				probePath := path + "__lobster_probe_nonexistent__"
+				probeStatus, probeBody, _, probeErr := utils.DoRequest(client, "GET", base+probePath, nil, nil)
+				if probeErr == nil && probeStatus == 200 {
+					probeStr := string(probeBody)
+					if strings.Contains(probeStr, "openclaw-app") || strings.Contains(probeStr, "<!doctype html") {
+						// Confirmed SPA fallback — not a real auth bypass
+						sev := utils.SevInfo
+						desc := fmt.Sprintf("GET %s returns SPA fallback (nginx catch-all) — not a real auth bypass", path)
+						f := utils.NewFinding(tStr, "auth",
+							fmt.Sprintf("Canvas/A2UI SPA fallback: %s", path),
+							sev, desc)
+						f.Evidence = fmt.Sprintf("HTTP %d (SPA fallback confirmed: random sub-path also returns 200+HTML)", status)
+						findings = append(findings, f)
+						fmt.Printf("  [~] %s is SPA fallback (not real auth bypass)\n", path)
+						continue
+					}
+				}
+				// Probe failed or returned different — might be real, keep HIGH
+			}
+
 			sev := utils.SevMedium
 			desc := fmt.Sprintf("GET %s returns 200 without Bearer token — static frontend assets exposed (by design for single-underscore paths)", path)
 			if isDoubleUnderscore {
 				sev = utils.SevHigh
 				desc = fmt.Sprintf("GET %s returns 200 without Bearer token — authenticated API path accessible without auth", path)
 			}
-			// Check if response is just static HTML (SPA shell) vs actual API data
-			bodyStr := string(body)
-			isStaticSPA := strings.Contains(bodyStr, "<!doctype html") || strings.Contains(bodyStr, "<html") ||
-				strings.Contains(bodyStr, "openclaw-app")
 			if isStaticSPA && !isDoubleUnderscore {
 				sev = utils.SevInfo
 				desc = fmt.Sprintf("GET %s returns frontend SPA shell without auth — static assets only, no API data", path)

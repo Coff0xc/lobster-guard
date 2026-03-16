@@ -134,10 +134,25 @@ func Fingerprint(target utils.Target, timeout time.Duration) (*FingerprintResult
 
 	// 5. Canvas / A2UI probe (both single and double underscore for compatibility)
 	for _, path := range []string{"/__openclaw/canvas/", "/__openclaw__/canvas/", "/__openclaw/a2ui/", "/__openclaw__/a2ui/"} {
-		status, _, _, err := utils.DoRequest(client, "GET", base+path, nil, nil)
+		status, body, _, err := utils.DoRequest(client, "GET", base+path, nil, nil)
 		if err != nil {
 			continue
 		}
+		// Detect SPA fallback — nginx returns 200 + HTML for all unmatched routes.
+		// If a random sub-path also returns 200+HTML, this is fallback, not a real endpoint.
+		bodyStr := string(body)
+		isSPA := strings.Contains(bodyStr, "openclaw-app") || strings.Contains(bodyStr, "OPENCLAW_CONTROL_UI_BASE_PATH")
+		isDoubleUnderscore := strings.Contains(path, "__openclaw__")
+		if status == 200 && isSPA && isDoubleUnderscore {
+			probePath := path + "__lobster_probe__"
+			probeStatus, probeBody, _, probeErr := utils.DoRequest(client, "GET", base+probePath, nil, nil)
+			if probeErr == nil && probeStatus == 200 && strings.Contains(string(probeBody), "openclaw-app") {
+				// SPA fallback confirmed — not a real endpoint
+				fmt.Printf("  [~] %s → SPA fallback (not real endpoint)\n", path)
+				continue
+			}
+		}
+
 		result.Endpoints = append(result.Endpoints, path)
 		if strings.Contains(path, "/canvas/") {
 			result.HasCanvas = status != 404
@@ -146,9 +161,13 @@ func Fingerprint(target utils.Target, timeout time.Duration) (*FingerprintResult
 		}
 		if status == 200 {
 			result.IsOpenClaw = true
+			sev := utils.SevMedium
+			if isDoubleUnderscore && !isSPA {
+				sev = utils.SevHigh
+			}
 			f := utils.NewFinding(tStr, "fingerprint",
 				fmt.Sprintf("Canvas/A2UI path accessible: %s", path),
-				utils.SevMedium,
+				sev,
 				fmt.Sprintf("%s returns %d — web UI exposed", path, status))
 			findings = append(findings, f)
 			fmt.Printf("  [+] %s → %d (exposed)\n", path, status)
