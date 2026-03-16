@@ -67,12 +67,17 @@ func NewGatewayWSClientWithOrigin(target Target, token string, timeout time.Dura
 	}
 
 	// Read the initial message — OpenClaw sends connect.challenge as the first frame
+	// Two known formats:
+	//   1. {"method":"connect.challenge","params":{"nonce":"..."}}
+	//   2. {"type":"event","event":"connect.challenge","payload":{"nonce":"...","ts":...}}
 	client.conn.SetReadDeadline(time.Now().Add(3 * time.Second))
 	var initMsg map[string]interface{}
 	if err := client.conn.ReadJSON(&initMsg); err == nil {
-		// Check if this is a challenge message
+		isChallenge := false
+
+		// Format 1: method-based
 		if method, ok := initMsg["method"].(string); ok && method == "connect.challenge" {
-			// Extract challenge nonce from params
+			isChallenge = true
 			if params, ok := initMsg["params"].(map[string]interface{}); ok {
 				if nonce, ok := params["nonce"].(string); ok {
 					client.challengeID = nonce
@@ -80,14 +85,33 @@ func NewGatewayWSClientWithOrigin(target Target, token string, timeout time.Dura
 					client.challengeID = challenge
 				}
 			}
-			// Also check result field
 			if result, ok := initMsg["result"].(map[string]interface{}); ok {
 				if nonce, ok := result["nonce"].(string); ok && client.challengeID == "" {
 					client.challengeID = nonce
 				}
 			}
+		}
+
+		// Format 2: event-based ({"type":"event","event":"connect.challenge","payload":{...}})
+		if evt, ok := initMsg["event"].(string); ok && evt == "connect.challenge" {
+			isChallenge = true
+			if payload, ok := initMsg["payload"].(map[string]interface{}); ok {
+				if nonce, ok := payload["nonce"].(string); ok {
+					client.challengeID = nonce
+				}
+			}
+		}
+
+		// Format 3: raw string check fallback
+		if !isChallenge {
+			raw, _ := json.Marshal(initMsg)
+			if strings.Contains(string(raw), "connect.challenge") {
+				isChallenge = true
+			}
+		}
+
+		if isChallenge {
 			if client.challengeID == "" {
-				// Fallback: store raw params as challenge indicator
 				client.challengeID = "challenge-received"
 			}
 			fmt.Printf("  [ws] Challenge gate active (nonce: %s)\n", Truncate(client.challengeID, 16))
@@ -133,15 +157,34 @@ func (c *GatewayWSClient) Call(method string, params interface{}) (json.RawMessa
 	// Read responses until we get our ID back
 	c.conn.SetReadDeadline(time.Now().Add(c.timeout))
 	for {
-		var resp WSMessage
-		if err := c.conn.ReadJSON(&resp); err != nil {
+		// Read raw message first to detect both RPC and event-format challenges
+		_, rawBytes, err := c.conn.ReadMessage()
+		if err != nil {
 			return nil, fmt.Errorf("ws read: %w", err)
 		}
 
-		// Filter out challenge messages — these are NOT method responses
+		// Check for event-format challenge: {"type":"event","event":"connect.challenge",...}
+		var rawMap map[string]interface{}
+		if json.Unmarshal(rawBytes, &rawMap) == nil {
+			if evt, ok := rawMap["event"].(string); ok && evt == "connect.challenge" {
+				c.authenticated = false
+				if payload, ok := rawMap["payload"].(map[string]interface{}); ok {
+					if nonce, ok := payload["nonce"].(string); ok && c.challengeID == "" {
+						c.challengeID = nonce
+					}
+				}
+				return nil, fmt.Errorf("challenge gate: server requires authentication (method %s blocked)", method)
+			}
+		}
+
+		var resp WSMessage
+		if err := json.Unmarshal(rawBytes, &resp); err != nil {
+			return nil, fmt.Errorf("ws read: failed to parse response: %w", err)
+		}
+
+		// Filter out method-format challenge messages
 		if resp.Method == "connect.challenge" {
 			c.authenticated = false
-			// Extract nonce if not already captured
 			if c.challengeID == "" {
 				var challengeParams map[string]interface{}
 				if json.Unmarshal(resp.Params, &challengeParams) == nil {
@@ -195,10 +238,13 @@ func (c *GatewayWSClient) CallRaw(data []byte) ([]byte, error) {
 		return msg, err
 	}
 
-	// Check if response is a challenge message
+	// Check if response is a challenge message (method or event format)
 	var parsed map[string]interface{}
 	if json.Unmarshal(msg, &parsed) == nil {
 		if method, ok := parsed["method"].(string); ok && method == "connect.challenge" {
+			return nil, fmt.Errorf("challenge gate: raw call blocked by authentication requirement")
+		}
+		if evt, ok := parsed["event"].(string); ok && evt == "connect.challenge" {
 			return nil, fmt.Errorf("challenge gate: raw call blocked by authentication requirement")
 		}
 	}

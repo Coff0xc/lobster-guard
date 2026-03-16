@@ -162,6 +162,20 @@ func EnumWSMethods(target utils.Target, token string, timeout time.Duration) ([]
 	}
 	defer ws.Close()
 
+	// If challenge gate is active and we're not authenticated, method enumeration
+	// is meaningless — all calls will fail with challenge/close errors.
+	if ws.HasChallengeGate() && !ws.IsAuthenticated() {
+		fmt.Printf("  [-] WS challenge gate active — method enumeration not possible without auth\n")
+		f := utils.NewFinding(tStr, "recon",
+			"WS challenge gate active — methods not enumerable without auth",
+			utils.SevInfo,
+			"WebSocket connection requires challenge-response authentication. "+
+				"Method enumeration skipped to avoid false positives.")
+		f.Evidence = fmt.Sprintf("Challenge nonce: %s", utils.Truncate(ws.ChallengeID(), 40))
+		findings = append(findings, f)
+		return available, findings
+	}
+
 	methods := []string{
 		// Core info
 		"config.get",

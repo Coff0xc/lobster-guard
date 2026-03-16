@@ -61,17 +61,35 @@ func NoAuthCheck(target utils.Target, timeout time.Duration) []utils.Finding {
 	}
 
 	// Test 3: Canvas path without auth (both single and double underscore)
+	// Note: single-underscore paths (/__openclaw/) serve static frontend SPA assets
+	// and are typically accessible by design. Double-underscore paths (/__openclaw__/)
+	// serve the authenticated API. Only flag double-underscore as HIGH.
 	for _, path := range []string{"/__openclaw/canvas/", "/__openclaw__/canvas/", "/__openclaw/a2ui/", "/__openclaw__/a2ui/"} {
-		status, _, _, err := utils.DoRequest(client, "GET", base+path, nil, nil)
+		status, body, _, err := utils.DoRequest(client, "GET", base+path, nil, nil)
 		if err != nil {
 			continue
 		}
 		if status == 200 {
+			isDoubleUnderscore := strings.Contains(path, "__openclaw__")
+			sev := utils.SevMedium
+			desc := fmt.Sprintf("GET %s returns 200 without Bearer token — static frontend assets exposed (by design for single-underscore paths)", path)
+			if isDoubleUnderscore {
+				sev = utils.SevHigh
+				desc = fmt.Sprintf("GET %s returns 200 without Bearer token — authenticated API path accessible without auth", path)
+			}
+			// Check if response is just static HTML (SPA shell) vs actual API data
+			bodyStr := string(body)
+			isStaticSPA := strings.Contains(bodyStr, "<!doctype html") || strings.Contains(bodyStr, "<html") ||
+				strings.Contains(bodyStr, "openclaw-app")
+			if isStaticSPA && !isDoubleUnderscore {
+				sev = utils.SevInfo
+				desc = fmt.Sprintf("GET %s returns frontend SPA shell without auth — static assets only, no API data", path)
+			}
+
 			f := utils.NewFinding(tStr, "auth",
 				fmt.Sprintf("Canvas/A2UI accessible without auth: %s", path),
-				utils.SevHigh,
-				fmt.Sprintf("GET %s returns 200 without Bearer token", path))
-			f.Evidence = fmt.Sprintf("HTTP %d", status)
+				sev, desc)
+			f.Evidence = fmt.Sprintf("HTTP %d, body: %s", status, truncate(bodyStr, 150))
 			findings = append(findings, f)
 			fmt.Printf("  [!] %s accessible without auth (HTTP 200)\n", path)
 		}
@@ -102,27 +120,44 @@ func NoAuthCheck(target utils.Target, timeout time.Duration) []utils.Finding {
 
 func testWsNoAuth(target utils.Target, timeout time.Duration) *utils.Finding {
 	tStr := target.String()
-	wsURL := target.WsURL()
 
-	dialer := utils.WsDialer(timeout)
-	conn, resp, err := dialer.Dial(wsURL, nil)
+	// Use GatewayWSClient which properly detects challenge gate
+	ws, err := utils.NewGatewayWSClient(target, "", timeout)
 	if err != nil {
-		if resp != nil && (resp.StatusCode == 401 || resp.StatusCode == 403) {
-			fmt.Printf("  [+] WebSocket requires auth (HTTP %d)\n", resp.StatusCode)
-			return nil
-		}
 		fmt.Printf("  [-] WebSocket connect failed: %v\n", err)
 		return nil
 	}
-	defer conn.Close()
+	defer ws.Close()
 
-	// If we connected without token, that's a problem
+	// If challenge gate is active, the server requires authentication —
+	// WS handshake success alone does NOT mean unauthenticated access.
+	if ws.HasChallengeGate() {
+		fmt.Printf("  [+] WebSocket has challenge gate — auth required (nonce: %s)\n",
+			utils.Truncate(ws.ChallengeID(), 16))
+		return nil
+	}
+
+	// No challenge gate — try an actual RPC call to confirm full access
+	result, callErr := ws.Call("health", nil)
+	if callErr != nil {
+		fmt.Printf("  [+] WebSocket connected but RPC calls fail: %v\n", callErr)
+		// Connection succeeded but can't execute methods — not full access
+		f := utils.NewFinding(tStr, "auth",
+			"WebSocket accepts connection without auth but RPC calls fail",
+			utils.SevMedium,
+			"WS handshake succeeds without token but method calls are rejected — partial exposure")
+		f.Evidence = fmt.Sprintf("Connected to %s, health call error: %v", target.WsURL(), callErr)
+		return &f
+	}
+
+	// Full unauthenticated WS access confirmed
 	f := utils.NewFinding(tStr, "auth", "WebSocket connects without authentication",
 		utils.SevCritical,
-		"WS connection established without any token — full control plane access")
-	f.Evidence = fmt.Sprintf("Connected to %s without credentials", wsURL)
+		"WS connection established without any token AND RPC calls succeed — full control plane access")
+	f.Evidence = fmt.Sprintf("Connected to %s without credentials, health returned: %s",
+		target.WsURL(), utils.Truncate(string(result), 200))
 	f.Remediation = "Enable gateway.auth.token or gateway.auth.password"
-	fmt.Printf("  [!!!] CRITICAL: WebSocket connected without auth!\n")
+	fmt.Printf("  [!!!] CRITICAL: WebSocket full access without auth!\n")
 	return &f
 }
 
