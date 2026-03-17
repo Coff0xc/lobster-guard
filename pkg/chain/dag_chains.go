@@ -5,7 +5,7 @@ import (
 	"github.com/coff0xc/lobster-guard/pkg/utils"
 )
 
-// BuildFullDAG creates the complete 55-chain DAG with dependencies and conditions
+// BuildFullDAG creates the complete 60-chain DAG with dependencies and conditions
 func BuildFullDAG(concurrency int, aggressive bool) *DAGChain {
 	dag := NewDAGChain(concurrency, aggressive)
 
@@ -637,6 +637,62 @@ func BuildFullDAG(concurrency int, aggressive bool) *DAGChain {
 		DependsOn: []int{0},
 		Execute: func(t utils.Target, c ChainConfig) []utils.Finding {
 			return exploit.CronWebhookSSRFCheck(t, exploit.CronWebhookSSRFConfig{Token: c.Token, Timeout: c.Timeout})
+		},
+	})
+
+	// === Level 1f: PwnKit-inspired LLM agent attack chains ===
+	dag.AddNode(&ChainNode{
+		ID:       61,
+		Name:     "CSS Hidden Content (Honeypot)",
+		Category: "injection",
+		Severity: "HIGH",
+		DependsOn: []int{0},
+		Execute: func(t utils.Target, c ChainConfig) []utils.Finding {
+			return exploit.HiddenContentCheck(t, exploit.HiddenContentConfig{Token: c.Token, Timeout: c.Timeout})
+		},
+	})
+
+	dag.AddNode(&ChainNode{
+		ID:       62,
+		Name:     "Poisoned Skill File",
+		Category: "injection",
+		Severity: "CRITICAL",
+		DependsOn: []int{0},
+		Execute: func(t utils.Target, c ChainConfig) []utils.Finding {
+			return exploit.SkillPoisonCheck(t, exploit.SkillPoisonConfig{Token: c.Token, Timeout: c.Timeout})
+		},
+	})
+
+	dag.AddNode(&ChainNode{
+		ID:       63,
+		Name:     "Bypass Soul Parameter Injection",
+		Category: "auth",
+		Severity: "CRITICAL",
+		DependsOn: []int{0},
+		Execute: func(t utils.Target, c ChainConfig) []utils.Finding {
+			return exploit.BypassSoulCheck(t, exploit.BypassSoulConfig{Token: c.Token, Timeout: c.Timeout})
+		},
+	})
+
+	dag.AddNode(&ChainNode{
+		ID:       64,
+		Name:     "C2 Exfiltration Command Filter",
+		Category: "rce",
+		Severity: "CRITICAL",
+		DependsOn: []int{0},
+		Execute: func(t utils.Target, c ChainConfig) []utils.Finding {
+			return exploit.C2ExfilCheck(t, exploit.C2ExfilConfig{Token: c.Token, Timeout: c.Timeout})
+		},
+	})
+
+	dag.AddNode(&ChainNode{
+		ID:       65,
+		Name:     "Webhook Signature Verification",
+		Category: "auth",
+		Severity: "HIGH",
+		DependsOn: []int{0},
+		Execute: func(t utils.Target, c ChainConfig) []utils.Finding {
+			return exploit.WebhookVerifyCheck(t, exploit.WebhookVerifyConfig{Token: c.Token, Timeout: c.Timeout})
 		},
 	})
 
