@@ -15,7 +15,7 @@ import (
 func PrintSummary(results []*utils.ScanResult) {
 	fmt.Println()
 	fmt.Println(strings.Repeat("═", 76))
-	color.New(color.FgCyan, color.Bold).Println("  SCAN SUMMARY")
+	color.New(color.FgCyan, color.Bold).Println("  扫描报告摘要")
 	fmt.Println(strings.Repeat("═", 76))
 
 	totalFindings := 0
@@ -26,11 +26,11 @@ func PrintSummary(results []*utils.ScanResult) {
 	for _, r := range results {
 		r.Done()
 		duration := r.EndAt.Sub(r.StartAt).Round(time.Millisecond)
-		fmt.Printf("\n  Target: %s (scanned in %v)\n", r.Target.String(), duration)
+		fmt.Printf("\n  目标: %s (耗时 %v)\n", r.Target.String(), duration)
 		fmt.Println(strings.Repeat("─", 60))
 
 		if len(r.Findings) == 0 {
-			color.New(color.FgGreen).Println("  No findings.")
+			color.New(color.FgGreen).Println("  未发现安全问题。")
 			continue
 		}
 
@@ -40,7 +40,7 @@ func PrintSummary(results []*utils.ScanResult) {
 		low := r.CountBySeverity(utils.SevLow)
 		info := r.CountBySeverity(utils.SevInfo)
 
-		fmt.Printf("  Findings: ")
+		fmt.Printf("  发现: ")
 		if crit > 0 {
 			color.New(color.FgRed, color.Bold).Printf("%d CRITICAL  ", crit)
 		}
@@ -67,9 +67,9 @@ func PrintSummary(results []*utils.ScanResult) {
 	fmt.Println()
 	fmt.Println(strings.Repeat("═", 76))
 	if totalFindings == 0 {
-		color.New(color.FgGreen, color.Bold).Println("  All clear — no security issues found.")
+		color.New(color.FgGreen, color.Bold).Println("  安全通过 — 未发现安全问题。")
 	} else {
-		color.New(color.FgYellow, color.Bold).Printf("  Total: %d findings across %d target(s)\n", totalFindings, len(results))
+		color.New(color.FgYellow, color.Bold).Printf("  共计: %d 个发现，涉及 %d 个目标\n", totalFindings, len(results))
 	}
 	fmt.Println(strings.Repeat("═", 76))
 }
@@ -83,6 +83,6 @@ func WriteJSON(results []*utils.ScanResult, path string) error {
 	if err := os.WriteFile(path, data, 0644); err != nil {
 		return fmt.Errorf("write file: %w", err)
 	}
-	fmt.Printf("\n[*] JSON report saved to %s\n", path)
+	fmt.Printf("\n[*] JSON 报告已保存至 %s\n", path)
 	return nil
 }

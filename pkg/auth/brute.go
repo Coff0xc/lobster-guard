@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/coff0xc/lobster-guard/internal/assets"
 	"github.com/coff0xc/lobster-guard/pkg/utils"
 )
 
@@ -208,6 +209,17 @@ func buildCandidateList(cfg BruteConfig) []string {
 			scanner := bufio.NewScanner(f)
 			for scanner.Scan() {
 				add(scanner.Text())
+			}
+		}
+	} else {
+		// Fallback: load built-in wordlist from embedded assets
+		if data, err := assets.ReadFile("rules/default_creds.txt"); err == nil {
+			sc := bufio.NewScanner(strings.NewReader(string(data)))
+			for sc.Scan() {
+				line := sc.Text()
+				if line != "" && !strings.HasPrefix(line, "#") {
+					add(line)
+				}
 			}
 		}
 	}

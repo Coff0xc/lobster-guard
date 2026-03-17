@@ -3,6 +3,9 @@
 /lobster-guard.exe
 /lobster-guard
 
+# Build output
+dist/
+
 # IDE
 .idea/
 .vscode/

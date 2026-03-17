@@ -11,6 +11,9 @@ import (
 	"github.com/coff0xc/lobster-guard/pkg/utils"
 )
 
+// QuietMode suppresses direct stdout prints from the engine (for TUI mode).
+var QuietMode bool
+
 // ScanEngine 提供可配置并发度的高性能扫描引擎
 // 支持优先级调度、速率限制、失败重试和实时进度报告
 type ScanEngine struct {
@@ -148,8 +151,10 @@ func (e *ScanEngine) RunWithCallback(tasks []ScanTask, cb func(Progress)) []util
 	limiter := newRateLimiter(e.RateLimit)
 	startTime := time.Now()
 
-	fmt.Printf("\n[*] ═══ Concurrent Engine: %d tasks, %d workers, rate=%.0f/s ═══\n",
-		len(tasks), e.MaxWorkers, e.RateLimit)
+	if !QuietMode {
+		fmt.Printf("\n[*] ═══ Concurrent Engine: %d tasks, %d workers, rate=%.0f/s ═══\n",
+			len(tasks), e.MaxWorkers, e.RateLimit)
+	}
 
 	// 构建优先级队列
 	pq := make(taskQueue, 0, len(tasks))
@@ -208,17 +213,21 @@ func (e *ScanEngine) RunWithCallback(tasks []ScanTask, cb func(Progress)) []util
 				e.report(cb, Progress{TaskID: t.ID, Name: t.Name, Status: "done", Elapsed: elapsed})
 			}
 
-			fmt.Printf("  [%d/%d] %s: %d findings\n",
-				atomic.LoadInt32(&completed), len(tasks), t.Name, len(findings))
+			if !QuietMode {
+				fmt.Printf("  [%d/%d] %s: %d findings\n",
+					atomic.LoadInt32(&completed), len(tasks), t.Name, len(findings))
+			}
 		}(task)
 	}
 
 	wg.Wait()
 
 	totalTime := time.Since(startTime)
-	fmt.Printf("\n[*] ═══ Engine complete: %d findings, %d tasks in %s (retried: %d, failed: %d) ═══\n",
-		len(allFindings), len(tasks), totalTime.Round(time.Millisecond),
-		atomic.LoadInt32(&retried), atomic.LoadInt32(&failed))
+	if !QuietMode {
+		fmt.Printf("\n[*] ═══ Engine complete: %d findings, %d tasks in %s (retried: %d, failed: %d) ═══\n",
+			len(allFindings), len(tasks), totalTime.Round(time.Millisecond),
+			atomic.LoadInt32(&retried), atomic.LoadInt32(&failed))
+	}
 
 	return allFindings
 }
@@ -300,7 +309,9 @@ func (e *ScanEngine) executeWithRetry(ctx context.Context, t *ScanTask, retried 
 
 		if attempt > 0 {
 			atomic.AddInt32(retried, 1)
-			fmt.Printf("  [!] Retry %d/%d: %s\n", attempt, e.RetryCount, t.Name)
+			if !QuietMode {
+				fmt.Printf("  [!] Retry %d/%d: %s\n", attempt, e.RetryCount, t.Name)
+			}
 			time.Sleep(time.Duration(attempt) * 500 * time.Millisecond)
 		}
 
@@ -329,11 +340,15 @@ func (e *ScanEngine) executeWithRetry(ctx context.Context, t *ScanTask, retried 
 		case <-ctx.Done():
 			return nil
 		case <-time.After(timeout):
-			fmt.Printf("  [!] Timeout: %s (attempt %d)\n", t.Name, attempt+1)
+			if !QuietMode {
+				fmt.Printf("  [!] Timeout: %s (attempt %d)\n", t.Name, attempt+1)
+			}
 			continue
 		case r := <-ch:
 			if r.err != nil {
-				fmt.Printf("  [!] Error: %s: %v\n", t.Name, r.err)
+				if !QuietMode {
+					fmt.Printf("  [!] Error: %s: %v\n", t.Name, r.err)
+				}
 				continue
 			}
 			return r.findings
