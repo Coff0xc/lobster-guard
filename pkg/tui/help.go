@@ -57,8 +57,8 @@ func renderBindings(bindings []key.Binding, width int) string {
 		d := helpDescStyle.Render(b.Help().Desc)
 		parts = append(parts, k+helpSepStyle.Render(":")+d)
 	}
-	line := strings.Join(parts, helpSepStyle.Render("  "))
-	return lipgloss.NewStyle().Width(width).Align(lipgloss.Center).Render(line)
+	line := strings.Join(parts, helpSepStyle.Render(" │ "))
+	return lipgloss.NewStyle().Width(width).Height(1).MaxWidth(width).Padding(0, 1).Render(line)
 }
 
 // renderHelpOverlay produces a full-screen help overlay.

@@ -9,32 +9,12 @@ var (
 	colorYellow  = lipgloss.Color("#F1FA8C")
 	colorGreen   = lipgloss.Color("#50FA7B")
 	colorCyan    = lipgloss.Color("#8BE9FD")
-	colorBlue    = lipgloss.Color("#6272A4")
 	colorPurple  = lipgloss.Color("#BD93F9")
 	colorWhite   = lipgloss.Color("#F8F8F2")
 	colorDim     = lipgloss.Color("#6272A4")
-	colorBg      = lipgloss.Color("#282A36")
 	colorBorder  = lipgloss.Color("#44475A")
 	colorActiveBorder = lipgloss.Color("#BD93F9")
 )
-
-// Severity colors
-func severityColor(sev string) lipgloss.Color {
-	switch sev {
-	case "CRITICAL":
-		return colorRed
-	case "HIGH":
-		return colorOrange
-	case "MEDIUM":
-		return colorYellow
-	case "LOW":
-		return colorCyan
-	case "INFO":
-		return colorDim
-	default:
-		return colorWhite
-	}
-}
 
 // Panels
 var (
@@ -70,7 +50,8 @@ var (
 // Progress panel styles
 var (
 	nodeRunningStyle = lipgloss.NewStyle().
-				Foreground(colorYellow)
+				Foreground(colorYellow).
+				Background(lipgloss.Color("#3E3D32"))
 
 	nodeDoneStyle = lipgloss.NewStyle().
 			Foreground(colorGreen)
@@ -107,6 +88,13 @@ var (
 	findingsTitleStyle = lipgloss.NewStyle().
 				Foreground(colorGreen).
 				Bold(true)
+
+	findingsHeaderStyle = lipgloss.NewStyle().
+				Foreground(colorPurple).
+				Bold(true)
+
+	findingsRowHighlight = lipgloss.NewStyle().
+				Background(lipgloss.Color("#44475A"))
 )
 
 // Log styles
@@ -115,8 +103,11 @@ var (
 			Foreground(colorCyan).
 			Bold(true)
 
-	logTimestampStyle = lipgloss.NewStyle().
-				Foreground(colorDim)
+	logSuccessStyle = lipgloss.NewStyle().Foreground(colorGreen)
+	logWarnStyle    = lipgloss.NewStyle().Foreground(colorOrange)
+	logErrorStyle   = lipgloss.NewStyle().Foreground(colorRed).Bold(true)
+	logDimStyle     = lipgloss.NewStyle().Foreground(colorDim)
+	logSepStyle     = lipgloss.NewStyle().Foreground(colorPurple).Bold(true)
 )
 
 // Input styles
@@ -134,6 +125,13 @@ var (
 			BorderStyle(lipgloss.NormalBorder()).
 			BorderForeground(colorBorder).
 			Padding(0, 1)
+
+	inputBoxActiveStyle = lipgloss.NewStyle().
+				BorderTop(true).
+				BorderBottom(true).
+				BorderStyle(lipgloss.NormalBorder()).
+				BorderForeground(colorActiveBorder).
+				Padding(0, 1)
 )
 
 // Help styles
@@ -157,10 +155,6 @@ var (
 
 	statusIdleStyle = lipgloss.NewStyle().
 			Foreground(colorGreen)
-
-	statusErrorStyle = lipgloss.NewStyle().
-				Foreground(colorRed).
-				Bold(true)
 )
 
 // panelStyle returns style for a panel based on active state.

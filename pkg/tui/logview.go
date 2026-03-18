@@ -39,14 +39,33 @@ func newLogViewport(width, height int) viewport.Model {
 	return vp
 }
 
-// appendLog adds a line to the log buffer and auto-scrolls.
+// appendLog adds a line to the log buffer with coloring and auto-scrolls.
 func appendLog(m *Model, line string) {
 	const maxLogLines = 1000
-	m.logLines = append(m.logLines, line)
+	colored := colorLogLine(line)
+	m.logLines = append(m.logLines, colored)
 	if len(m.logLines) > maxLogLines {
 		m.logLines = m.logLines[len(m.logLines)-maxLogLines:]
 	}
 	// Set content first, then scroll — fixes GotoBottom on stale content
 	m.logViewport.SetContent(strings.Join(m.logLines, "\n"))
 	m.logViewport.GotoBottom()
+}
+
+// colorLogLine applies lipgloss coloring based on log line prefix/content.
+func colorLogLine(line string) string {
+	switch {
+	case strings.Contains(line, "[+]") || strings.Contains(line, "✓") || strings.Contains(line, "✅"):
+		return logSuccessStyle.Render(line)
+	case strings.Contains(line, "[!!]") || strings.Contains(line, "[CRITICAL]") || strings.Contains(line, "[ERROR]") || strings.Contains(line, "🔴"):
+		return logErrorStyle.Render(line)
+	case strings.Contains(line, "[!]"):
+		return logWarnStyle.Render(line)
+	case strings.Contains(line, "[-]"):
+		return logDimStyle.Render(line)
+	case strings.Contains(line, "════"):
+		return logSepStyle.Render(line)
+	default:
+		return line
+	}
 }

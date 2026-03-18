@@ -27,6 +27,7 @@ const (
 )
 
 const (
+	Version   = "4.1.0"
 	minWidth  = 80
 	minHeight = 24
 )
@@ -88,7 +89,7 @@ func NewModel(target utils.Target, token string, useTLS bool, timeout time.Durat
 	s.Spinner = spinner.Dot
 	s.Style = lipgloss.NewStyle().Foreground(colorYellow)
 
-	return Model{
+	m := Model{
 		activePanel: PanelInput,
 		keys:        DefaultKeyMap(),
 		spinner:     s,
@@ -101,6 +102,21 @@ func NewModel(target utils.Target, token string, useTLS bool, timeout time.Durat
 		timeout:     timeout,
 		sortMode:    SortBySeverity,
 	}
+
+	// Welcome guide
+	welcome := []string{
+		"🦞 LobsterGuard v" + Version + " — AI 编程平台安全评估工具",
+		"",
+		"快速开始: scan <host:port>            完整扫描",
+		"          scan <host:port> --token x   带认证扫描",
+		"          help                         查看所有命令",
+	}
+	for _, line := range welcome {
+		m.logLines = append(m.logLines, line)
+	}
+	m.logViewport.SetContent(strings.Join(m.logLines, "\n"))
+
+	return m
 }
 
 // Init implements tea.Model.
@@ -228,11 +244,17 @@ func (m Model) View() string {
 		return renderMinSizeWarning(m.width, m.height)
 	}
 
-	// Layout calculation
-	headerH := 1
-	helpH := 1
-	inputH := 1
-	remainH := m.height - headerH - helpH - inputH
+	// Help overlay on top — early return
+	if m.showHelp {
+		return renderHelpOverlay(m.keys, m.width, m.height)
+	}
+
+	// Layout: header(2) + upper panels + lower panel + input(3) + help(1)
+	fixedH := 6 // header(2) + input(3) + help(1)
+	remainH := m.height - fixedH
+	if remainH < 6 {
+		remainH = 6
+	}
 	upperH := remainH * 45 / 100
 	if upperH < 5 {
 		upperH = 5
@@ -245,33 +267,26 @@ func (m Model) View() string {
 	leftW := m.leftWidth()
 	rightW := m.width - leftW
 
-	// Render panels
 	header := renderHeader(&m, m.width)
-
 	progressPanel := renderProgress(&m, leftW, upperH, m.activePanel == PanelProgress)
 	findingsPanel := renderFindings(&m, rightW, upperH, m.activePanel == PanelFindings)
 	upperRow := lipgloss.JoinHorizontal(lipgloss.Top, progressPanel, findingsPanel)
-
 	logPanel := renderLogView(&m, m.width, lowerH, m.activePanel == PanelLog)
-
 	input := renderInput(&m, m.width)
 	help := renderHelpBar(&m, m.width)
 
 	view := lipgloss.JoinVertical(lipgloss.Left,
-		header,
-		upperRow,
-		logPanel,
-		input,
-		help,
+		header, upperRow, logPanel, input, help,
 	)
 
-	// Help overlay on top
-	if m.showHelp {
-		overlay := renderHelpOverlay(m.keys, m.width, m.height)
-		return overlay
+	// Hard clamp to terminal size — Bubble Tea adds a trailing newline,
+	// so we output exactly (height-1) lines to prevent scroll.
+	placed := lipgloss.Place(m.width, m.height-1, lipgloss.Left, lipgloss.Top, view)
+	lines := strings.Split(placed, "\n")
+	if len(lines) > m.height-1 {
+		lines = lines[:m.height-1]
 	}
-
-	return view
+	return strings.Join(lines, "\n")
 }
 
 // --- Key handling ---

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -11,20 +12,17 @@ import (
 
 	"github.com/coff0xc/lobster-guard/internal/assets"
 	"github.com/coff0xc/lobster-guard/pkg/ai"
-	"github.com/coff0xc/lobster-guard/pkg/audit"
 	"github.com/coff0xc/lobster-guard/pkg/auth"
-	"github.com/coff0xc/lobster-guard/pkg/chain"
-	"github.com/coff0xc/lobster-guard/pkg/concurrent"
 	"github.com/coff0xc/lobster-guard/pkg/cve"
 	"github.com/coff0xc/lobster-guard/pkg/discovery"
 	"github.com/coff0xc/lobster-guard/pkg/fuzzer"
 	"github.com/coff0xc/lobster-guard/pkg/interactive"
 	"github.com/coff0xc/lobster-guard/pkg/mcp"
-	"github.com/coff0xc/lobster-guard/pkg/recon"
 	"github.com/coff0xc/lobster-guard/pkg/report"
-	"github.com/coff0xc/lobster-guard/pkg/scanner"
+	"github.com/coff0xc/lobster-guard/pkg/scan"
 	"github.com/coff0xc/lobster-guard/pkg/tui"
 	"github.com/coff0xc/lobster-guard/pkg/utils"
+	"github.com/coff0xc/lobster-guard/pkg/webui"
 	"github.com/spf13/cobra"
 )
 
@@ -196,6 +194,17 @@ func main() {
 	tuiCmd.Flags().StringVar(&flagToken, "token", "", "Gateway 认证令牌")
 	rootCmd.AddCommand(tuiCmd)
 
+	guiCmd := &cobra.Command{
+		Use:   "gui",
+		Short: "Web 图形界面（自动打开浏览器）",
+		Example: `  lobster-guard gui
+  lobster-guard gui -t 10.0.0.5:18789 --token abc123 --tls`,
+		RunE: runGUI,
+	}
+	addCommonFlags(guiCmd)
+	guiCmd.Flags().StringVar(&flagToken, "token", "", "Gateway 认证令牌")
+	rootCmd.AddCommand(guiCmd)
+
 	extractCmd := &cobra.Command{
 		Use:   "extract [目录]",
 		Short: "导出内置 Nuclei 模板和规则文件到指定目录",
@@ -295,6 +304,27 @@ func makeBruteConfig() auth.BruteConfig {
 	return cfg
 }
 
+func buildScanConfig() scan.ScanConfig {
+	cfg := scan.DefaultScanConfig()
+	cfg.Token = flagToken
+	cfg.HookToken = flagHookToken
+	cfg.HookPath = flagHookPath
+	cfg.CallbackURL = flagCallback
+	cfg.Timeout = time.Duration(flagTimeout) * time.Second
+	cfg.NoBrute = flagNoBrute
+	cfg.Aggressive = flagAggressive
+	cfg.UltraAggressive = flagUltraAggressive
+	cfg.DAG = flagDAG
+	cfg.ChainID = flagChainID
+	cfg.Workers = flagWorkers
+	cfg.RateLimit = flagRateLimit
+	if !cfg.NoBrute {
+		cfg.BruteConfig = makeBruteConfig()
+		cfg.BruteConfig.Timeout = cfg.Timeout
+	}
+	return cfg
+}
+
 func runConcurrent(targets []utils.Target, worker func(utils.Target) *utils.ScanResult) []*utils.ScanResult {
 	if flagConcurrency <= 1 {
 		var results []*utils.ScanResult
@@ -334,85 +364,24 @@ func runScan(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	timeout := time.Duration(flagTimeout) * time.Second
+	cfg := buildScanConfig()
+	cfg.NoExploit = flagNoExploit
 
 	results := runConcurrent(targets, func(target utils.Target) *utils.ScanResult {
 		result := utils.NewScanResult(target)
-
-		// 1. Fingerprint
-		fpResult, fpFindings := scanner.Fingerprint(target, timeout)
-		for _, f := range fpFindings {
+		ctx := context.Background()
+		findings := scan.RunFullScan(ctx, target, cfg, nil, nil)
+		for _, f := range findings {
 			result.Add(f)
 		}
-		if !fpResult.IsOpenClaw {
-			fmt.Printf("\n[*] %s is not OpenClaw, skipping\n", target.String())
-			result.Done()
-			return result
-		}
-
-		// 2. No-auth check
-		for _, f := range auth.NoAuthCheck(target, timeout) {
-			result.Add(f)
-		}
-
-		// 3. Brute force
-		activeToken := flagToken
-		if !flagNoBrute && fpResult.AuthMode != "none" {
-			cfg := makeBruteConfig()
-			cfg.Timeout = timeout
-			bruteResult, bruteFindings := auth.TokenBrute(target, cfg)
-			for _, f := range bruteFindings {
-				result.Add(f)
-			}
-			if bruteResult != nil && bruteResult.Found && bruteResult.Token != "" {
-				activeToken = bruteResult.Token
+		// AI analysis
+		if flagAIAnalyze && len(findings) > 0 {
+			analyzer := ai.NewAnalyzer()
+			analysis, _ := analyzer.AnalyzeFindings(findings, "triage")
+			if analysis != nil {
+				fmt.Printf("\n[AI] Risk: %d/100 | %s\n", analysis.RiskScore, analysis.Summary)
 			}
 		}
-
-		// 4. Recon
-		for _, f := range reconAll(target, activeToken, timeout) {
-			result.Add(f)
-		}
-
-		// 5. Config audit
-		if activeToken != "" {
-			for _, f := range audit.RunAudit(target, audit.AuditConfig{Token: activeToken, Timeout: timeout}) {
-				result.Add(f)
-			}
-		}
-
-		// 6. Exploit verification — full OpenClaw attack chain
-		// Always run exploit chains: zero-auth chains (ClawJacked, CORS, WS hijack,
-		// gatewayUrl SSRF, browser upload traversal) work without a token.
-		// Token-dependent chains will self-skip when token is empty.
-		if !flagNoExploit {
-			chainCfg := chain.ChainConfig{
-				Token:       activeToken,
-				HookToken:   flagHookToken,
-				HookPath:    flagHookPath,
-				CallbackURL: flagCallback,
-				Timeout:     timeout,
-			}
-			var exploitFindings []utils.Finding
-			if flagAggressive {
-				exploitFindings = chain.RunDAGChain(target, chainCfg, 20, true)
-			} else {
-				exploitFindings = chain.RunFullChain(target, chainCfg)
-			}
-			for _, f := range exploitFindings {
-				result.Add(f)
-			}
-
-			// AI analysis
-			if flagAIAnalyze && len(exploitFindings) > 0 {
-				analyzer := ai.NewAnalyzer()
-				analysis, _ := analyzer.AnalyzeFindings(exploitFindings, "triage")
-				if analysis != nil {
-					fmt.Printf("\n[AI] Risk: %d/100 | %s\n", analysis.RiskScore, analysis.Summary)
-				}
-			}
-		}
-
 		result.Done()
 		return result
 	})
@@ -426,12 +395,11 @@ func runFingerprint(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	timeout := time.Duration(flagTimeout) * time.Second
+	cfg := buildScanConfig()
 	var results []*utils.ScanResult
 	for _, target := range targets {
 		result := utils.NewScanResult(target)
-		_, findings := scanner.Fingerprint(target, timeout)
-		for _, f := range findings {
+		for _, f := range scan.RunFingerprint(target, cfg, nil) {
 			result.Add(f)
 		}
 		result.Done()
@@ -447,20 +415,12 @@ func runAuth(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	timeout := time.Duration(flagTimeout) * time.Second
+	cfg := buildScanConfig()
 	var results []*utils.ScanResult
 	for _, target := range targets {
 		result := utils.NewScanResult(target)
-		for _, f := range auth.NoAuthCheck(target, timeout) {
+		for _, f := range scan.RunAuthCheck(target, cfg, nil) {
 			result.Add(f)
-		}
-		if !flagNoBrute {
-			cfg := makeBruteConfig()
-			cfg.Timeout = timeout
-			_, findings := auth.TokenBrute(target, cfg)
-			for _, f := range findings {
-				result.Add(f)
-			}
 		}
 		result.Done()
 		results = append(results, result)
@@ -475,11 +435,11 @@ func runAudit(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	timeout := time.Duration(flagTimeout) * time.Second
+	cfg := buildScanConfig()
 	var results []*utils.ScanResult
 	for _, target := range targets {
 		result := utils.NewScanResult(target)
-		for _, f := range audit.RunAudit(target, audit.AuditConfig{Token: flagToken, Timeout: timeout}) {
+		for _, f := range scan.RunAuditCheck(target, cfg, nil) {
 			result.Add(f)
 		}
 		result.Done()
@@ -495,28 +455,17 @@ func runRecon(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	timeout := time.Duration(flagTimeout) * time.Second
+	cfg := buildScanConfig()
 	var results []*utils.ScanResult
 	for _, target := range targets {
 		result := utils.NewScanResult(target)
-		for _, f := range reconAll(target, flagToken, timeout) {
+		for _, f := range scan.RunReconCheck(target, cfg, nil) {
 			result.Add(f)
 		}
 		result.Done()
 		results = append(results, result)
 	}
 	return outputResults(results)
-}
-
-func reconAll(target utils.Target, token string, timeout time.Duration) []utils.Finding {
-	var all []utils.Finding
-	_, f1 := recon.VersionDetect(target, timeout)
-	all = append(all, f1...)
-	_, f2 := recon.EnumEndpoints(target, token, timeout)
-	all = append(all, f2...)
-	_, f3 := recon.EnumWSMethods(target, token, timeout)
-	all = append(all, f3...)
-	return all
 }
 
 // --- exploit only (full OpenClaw attack chain — v2 DAG-based) ---
@@ -526,66 +475,12 @@ func runExploit(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	timeout := time.Duration(flagTimeout) * time.Second
+	cfg := buildScanConfig()
 
 	results := runConcurrent(targets, func(target utils.Target) *utils.ScanResult {
 		result := utils.NewScanResult(target)
-		chainCfg := chain.ChainConfig{
-			Token:       flagToken,
-			HookToken:   flagHookToken,
-			HookPath:    flagHookPath,
-			CallbackURL: flagCallback,
-			Timeout:     timeout,
-		}
-
-		var findings []utils.Finding
-		if flagDAG {
-			concurrency := flagConcurrency
-			if concurrency < 1 {
-				concurrency = 5
-			}
-			if flagUltraAggressive {
-				concurrency = 200
-			} else if flagAggressive && concurrency < 20 {
-				concurrency = 20
-			}
-
-			if flagChainID >= 0 {
-				dag := chain.BuildFullDAG(concurrency, flagAggressive || flagUltraAggressive)
-				findings = dag.ExecuteSingle(target, chainCfg, flagChainID)
-			} else if flagUltraAggressive || flagWorkers > 0 {
-				// v4: Use concurrent engine for ultra-aggressive or explicit workers
-				workers := flagWorkers
-				if workers <= 0 {
-					workers = concurrency
-				}
-				engine := concurrent.NewEngine(workers, flagRateLimit)
-				engine.Timeout = timeout
-				dag := chain.BuildFullDAG(workers, true)
-				var tasks []concurrent.ScanTask
-				for _, node := range dag.Nodes {
-					n := node
-					tasks = append(tasks, concurrent.ScanTask{
-						ID:       n.ID,
-						Name:     n.Name,
-						Target:   target,
-						Token:    flagToken,
-						ChainID:  n.ID,
-						Priority: 1,
-						Execute: func(t utils.Target, token string) []utils.Finding {
-							return n.Execute(t, chainCfg)
-						},
-					})
-				}
-				findings = engine.Run(tasks)
-			} else {
-				findings = chain.RunDAGChain(target, chainCfg, concurrency, flagAggressive)
-			}
-		} else {
-			// v1: linear execution (legacy)
-			findings = chain.RunFullChain(target, chainCfg)
-		}
-
+		ctx := context.Background()
+		findings := scan.RunExploitScan(ctx, target, cfg, nil, nil)
 		for _, f := range findings {
 			result.Add(f)
 		}
@@ -745,6 +640,28 @@ func runTUI(cmd *cobra.Command, args []string) error {
 	}
 	timeout := time.Duration(flagTimeout) * time.Second
 	return tui.Run(target, flagToken, flagTLS, timeout)
+}
+
+// --- gui: web GUI dashboard ---
+func runGUI(cmd *cobra.Command, args []string) error {
+	var target utils.Target
+	if flagTarget != "" {
+		t, err := utils.ParseTarget(flagTarget)
+		if err != nil {
+			return fmt.Errorf("invalid target: %w", err)
+		}
+		if flagTLS {
+			t.UseTLS = true
+		}
+		target = t
+	}
+	if flagToken == "" {
+		if envToken := os.Getenv("LOBSTERGUARD_TOKEN"); envToken != "" {
+			flagToken = envToken
+		}
+	}
+	timeout := time.Duration(flagTimeout) * time.Second
+	return webui.Run(target, flagToken, flagTLS, timeout)
 }
 
 func runExtract(cmd *cobra.Command, args []string) error {

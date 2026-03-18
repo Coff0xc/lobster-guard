@@ -121,15 +121,17 @@ func renderProgress(m *Model, width, height int, active bool) string {
 		lines = append(lines, strings.Repeat(" ", innerW))
 	}
 
-	// Progress bar
+	// Progress bar with percentage text
 	pct := 0.0
 	if m.totalNodes > 0 {
 		pct = float64(m.doneNodes) / float64(m.totalNodes)
 	}
 	bar := m.progressBar.ViewAs(pct)
+	pctText := lipgloss.NewStyle().Foreground(colorPurple).Bold(true).
+		Render(fmt.Sprintf(" [%d/%d %d%%]", m.doneNodes, m.totalNodes, int(pct*100)))
 
 	nodeList := strings.Join(lines, "\n")
-	content := title + "\n" + nodeList + "\n" + bar
+	content := title + "\n" + nodeList + "\n" + bar + pctText
 
 	return panelStyle(active, width-2, height-2).Render(content)
 }

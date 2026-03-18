@@ -43,7 +43,13 @@ func renderFindings(m *Model, width, height int, active bool) string {
 	if active {
 		titleStyle = titleStyle.Foreground(colorActiveBorder)
 	}
-	title := titleStyle.Render(fmt.Sprintf(" 漏洞发现 (%d) [排序:%s] ", count, m.sortMode))
+
+	// Title with severity counts
+	titleText := fmt.Sprintf(" 漏洞发现 (%d) ", count)
+	if count > 0 {
+		titleText = fmt.Sprintf(" 漏洞发现 (%d)  %s ", count, severityCounts(m))
+	}
+	title := titleStyle.Render(titleText)
 
 	innerW := width - 4
 	if innerW < 10 {
@@ -65,8 +71,25 @@ func renderFindings(m *Model, width, height int, active bool) string {
 	copy(sorted, m.findings)
 	sortFindings(sorted, m.sortMode)
 
+	// Column widths
+	sevW := 9
+	modW := innerW / 4
+	if modW < 8 {
+		modW = 8
+	}
+	titleW := innerW - sevW - modW - 8
+	if titleW < 8 {
+		titleW = 8
+	}
+
+	// Table header + separator (consume 2 lines)
+	header := findingsHeaderStyle.Render(
+		fmt.Sprintf(" %-*s│ %-*s│ %s", sevW, "SEV", modW+1, "MODULE", "TITLE"))
+	sep := lipgloss.NewStyle().Foreground(colorDim).Render(
+		" " + strings.Repeat("─", sevW) + "┼" + strings.Repeat("─", modW+1) + "┼" + strings.Repeat("─", titleW+2))
+
 	// Build table rows with scrolling
-	maxVisible := innerH - 1 // -1 for title
+	maxVisible := innerH - 3 // -1 title -2 header+sep
 	if maxVisible < 1 {
 		maxVisible = 1
 	}
@@ -86,17 +109,6 @@ func renderFindings(m *Model, width, height int, active bool) string {
 		endIdx = len(sorted)
 	}
 
-	// Column widths
-	sevW := 5
-	modW := innerW / 4
-	if modW < 8 {
-		modW = 8
-	}
-	titleW := innerW - sevW - modW - 6
-	if titleW < 8 {
-		titleW = 8
-	}
-
 	var lines []string
 	for i := startIdx; i < endIdx; i++ {
 		f := sorted[i]
@@ -114,11 +126,15 @@ func renderFindings(m *Model, width, height int, active bool) string {
 		}
 
 		indicator := " "
-		if active && i == m.findingsCursor+startIdx {
+		isSelected := active && i == m.findingsCursor+startIdx
+		if isSelected {
 			indicator = ">"
 		}
 
-		line := fmt.Sprintf("%s %s │ %-*s │ %s", indicator, sevStyled, modW, mod, ttl)
+		line := fmt.Sprintf("%s%s│ %-*s│ %s", indicator, sevStyled, modW+1, mod, ttl)
+		if isSelected {
+			line = findingsRowHighlight.Render(line)
+		}
 		lines = append(lines, line)
 	}
 
@@ -127,8 +143,31 @@ func renderFindings(m *Model, width, height int, active bool) string {
 		lines = append(lines, strings.Repeat(" ", innerW))
 	}
 
-	content := title + "\n" + strings.Join(lines, "\n")
+	content := title + "\n" + header + "\n" + sep + "\n" + strings.Join(lines, "\n")
 	return panelStyle(active, width-2, height-2).Render(content)
+}
+
+// severityCounts returns a compact colored severity summary string.
+func severityCounts(m *Model) string {
+	var crit, high, med, low int
+	for _, f := range m.findings {
+		switch f.Severity.String() {
+		case "CRITICAL":
+			crit++
+		case "HIGH":
+			high++
+		case "MEDIUM":
+			med++
+		case "LOW":
+			low++
+		}
+	}
+	return fmt.Sprintf("%s %s %s %s",
+		findingCritStyle.Render(fmt.Sprintf("CRIT:%d", crit)),
+		findingHighStyle.Render(fmt.Sprintf("HIGH:%d", high)),
+		findingMedStyle.Render(fmt.Sprintf("MED:%d", med)),
+		findingLowStyle.Render(fmt.Sprintf("LOW:%d", low)),
+	)
 }
 
 func styleSeverity(sev string, width int) string {

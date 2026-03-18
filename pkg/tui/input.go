@@ -38,7 +38,11 @@ func renderInput(m *Model, width int) string {
 	if m.cmdInput.Width < 10 {
 		m.cmdInput.Width = 10
 	}
-	return inputBoxStyle.Width(width - 2).Render(m.cmdInput.View())
+	style := inputBoxStyle
+	if m.activePanel == PanelInput {
+		style = inputBoxActiveStyle
+	}
+	return style.Width(width - 2).Render(m.cmdInput.View())
 }
 
 // completeCommand returns the first matching command for the given prefix.
@@ -80,8 +84,44 @@ func parseCommand(m *Model, raw string) tea.Cmd {
 	case "timeout":
 		return cmdTimeout(m, args)
 	case "scan":
+		// Support: scan <target> [--token x] [--tls]
+		if len(args) > 0 {
+			t, err := utils.ParseTarget(args[0])
+			if err == nil {
+				t.UseTLS = m.useTLS
+				m.target = t
+				appendLog(m, fmt.Sprintf("[*] 目标已设置: %s", t.String()))
+			}
+			for i := 1; i < len(args); i++ {
+				switch args[i] {
+				case "--token":
+					if i+1 < len(args) {
+						m.token = args[i+1]
+						appendLog(m, "[*] Token 已更新")
+						i++
+					}
+				case "--tls":
+					m.useTLS = true
+					m.target.UseTLS = true
+				}
+			}
+		}
 		return cmdScan(m)
 	case "exploit":
+		// Support: exploit <target> [chain_id]
+		if len(args) > 0 {
+			// First arg could be target or chain_id
+			if _, err := strconv.Atoi(args[0]); err != nil {
+				// It's a target
+				t, err := utils.ParseTarget(args[0])
+				if err == nil {
+					t.UseTLS = m.useTLS
+					m.target = t
+					appendLog(m, fmt.Sprintf("[*] 目标已设置: %s", t.String()))
+				}
+				args = args[1:]
+			}
+		}
 		return cmdExploit(m, args)
 	case "fingerprint":
 		return cmdModule(m, "fingerprint")

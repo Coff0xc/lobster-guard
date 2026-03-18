@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LobsterGuard — 安全评估工具</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <header id="header">
+    <span class="logo">🦞 LobsterGuard v4.1.0</span>
+    <span class="subtitle">OpenClaw 安全评估工具</span>
+    <span class="header-badge" id="header-badge">就绪</span>
+  </header>
+
+  <div id="controls">
+    <div class="target-group">
+      <label>目标:</label>
+      <textarea id="target" rows="2" placeholder="支持多种格式，逗号或换行分隔:&#10;192.168.1.100:3002, 10.0.0.5:18789&#10;192.168.1.0/24  10.0.0.1-50  (自动扫描默认端口)"></textarea>
+    </div>
+    <div class="ctrl-row">
+      <label>令牌: <input type="text" id="token" placeholder="Gateway 认证令牌"></label>
+      <label class="checkbox-label"><input type="checkbox" id="tls"><span class="checkbox-text">加密连接</span></label>
+      <label>超时: <input type="number" id="timeout" value="10" min="1" max="120" style="width:60px">秒</label>
+      <label>模式:
+        <select id="mode">
+          <option value="scan">🔍 完整扫描</option>
+          <option value="exploit">⚔️ 攻击链</option>
+          <option value="fingerprint">🔎 指纹识别</option>
+          <option value="auth">🔑 认证检测</option>
+          <option value="recon">📡 信息收集</option>
+          <option value="audit">📋 配置审计</option>
+        </select>
+      </label>
+      <div class="btn-group">
+        <button id="btn-scan" onclick="startScan()">▶ 开始扫描</button>
+        <button id="btn-cancel" onclick="cancelScan()" disabled>■ 取消</button>
+        <button id="btn-export" onclick="exportReport()" disabled>⬇ 导出报告</button>
+      </div>
+    </div>
+    <div class="port-hint">默认端口: 3002, 18789, 8080, 8443, 3000, 3001, 8000, 8888, 9090（输入纯 IP/CIDR 时自动扫描）</div>
+  </div>
+
+  <div id="main">
+    <div id="progress-panel">
+      <div class="panel-title"><span class="panel-icon">⛓</span> 攻击链进度</div>
+      <div id="progress-bar-container">
+        <div id="progress-bar"></div>
+        <span id="progress-text">0%</span>
+      </div>
+      <div id="chain-list"></div>
+    </div>
+    <div id="findings-panel">
+      <div class="panel-title"><span class="panel-icon">🐛</span> 漏洞发现 <span id="findings-count" class="count-badge">0</span></div>
+      <table id="findings-table">
+        <thead><tr><th>#</th><th>等级</th><th>模块</th><th>标题</th></tr></thead>
+        <tbody id="findings-body"></tbody>
+      </table>
+      <div id="findings-empty">暂无发现，等待扫描...</div>
+    </div>
+  </div>
+
+  <div id="log-resize-handle"></div>
+  <div id="log-panel">
+    <div class="panel-title"><span class="panel-icon">📜</span> 实时日志</div>
+    <div id="log-content"></div>
+  </div>
+
+  <div id="statusbar">
+    <span id="status-state" class="idle">● 就绪</span>
+    <span id="status-counts">严重:0 高危:0 中危:0 低危:0 信息:0</span>
+    <span id="status-elapsed"></span>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

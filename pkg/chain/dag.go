@@ -1,6 +1,7 @@
 package chain
 
 import (
+	"context"
 	"fmt"
 	"sync"
 	"time"
@@ -226,4 +227,135 @@ func HasFindingWithSeverity(findings []utils.Finding, sev utils.Severity) bool {
 // HasAnyFinding returns true if there are any findings
 func HasAnyFinding(findings []utils.Finding) bool {
 	return len(findings) > 0
+}
+
+// NodeProgress reports the status of a single DAG node execution.
+type NodeProgress struct {
+	NodeID  int
+	Name    string
+	Status  string        // "pending", "running", "done", "skip", "error"
+	Elapsed time.Duration
+}
+
+// ExecuteWithProgress runs the DAG with context cancellation and progress callbacks.
+func (d *DAGChain) ExecuteWithProgress(ctx context.Context, target utils.Target, cfg ChainConfig, onProgress func(NodeProgress), onFinding func(utils.Finding)) []utils.Finding {
+	if len(d.Nodes) == 0 {
+		return nil
+	}
+
+	// Report all nodes as pending
+	for _, node := range d.Nodes {
+		if onProgress != nil {
+			onProgress(NodeProgress{NodeID: node.ID, Name: node.Name, Status: "pending"})
+		}
+	}
+
+	var (
+		allFindings []utils.Finding
+		mu          sync.Mutex
+		completed   = make(map[int]bool)
+		nodeResults = make(map[int][]utils.Finding)
+		sem         = make(chan struct{}, d.Concurrency)
+	)
+
+	levels := d.topologicalLevels()
+
+	for _, level := range levels {
+		if ctx.Err() != nil {
+			// Mark remaining as skip
+			for _, node := range level {
+				mu.Lock()
+				done := completed[node.ID]
+				mu.Unlock()
+				if !done && onProgress != nil {
+					onProgress(NodeProgress{NodeID: node.ID, Name: node.Name, Status: "skip"})
+				}
+			}
+			continue
+		}
+
+		var wg sync.WaitGroup
+		for _, node := range level {
+			if ctx.Err() != nil {
+				if onProgress != nil {
+					onProgress(NodeProgress{NodeID: node.ID, Name: node.Name, Status: "skip"})
+				}
+				mu.Lock()
+				completed[node.ID] = true
+				mu.Unlock()
+				continue
+			}
+
+			// Check dependencies
+			depsMet := true
+			for _, depID := range node.DependsOn {
+				if !completed[depID] {
+					depsMet = false
+					break
+				}
+			}
+			if !depsMet {
+				if onProgress != nil {
+					onProgress(NodeProgress{NodeID: node.ID, Name: node.Name, Status: "skip"})
+				}
+				mu.Lock()
+				completed[node.ID] = true
+				mu.Unlock()
+				continue
+			}
+
+			// Check condition
+			if node.Condition != nil {
+				var depFindings []utils.Finding
+				mu.Lock()
+				for _, depID := range node.DependsOn {
+					depFindings = append(depFindings, nodeResults[depID]...)
+				}
+				mu.Unlock()
+				if !node.Condition(depFindings) {
+					if onProgress != nil {
+						onProgress(NodeProgress{NodeID: node.ID, Name: node.Name, Status: "skip"})
+					}
+					mu.Lock()
+					completed[node.ID] = true
+					mu.Unlock()
+					continue
+				}
+			}
+
+			wg.Add(1)
+			sem <- struct{}{}
+			go func(n *ChainNode) {
+				defer wg.Done()
+				defer func() { <-sem }()
+
+				if onProgress != nil {
+					onProgress(NodeProgress{NodeID: n.ID, Name: n.Name, Status: "running"})
+				}
+
+				start := time.Now()
+				findings := n.Execute(target, cfg)
+				elapsed := time.Since(start)
+
+				mu.Lock()
+				allFindings = append(allFindings, findings...)
+				nodeResults[n.ID] = findings
+				completed[n.ID] = true
+				mu.Unlock()
+
+				for _, f := range findings {
+					if onFinding != nil {
+						onFinding(f)
+					}
+				}
+
+				if onProgress != nil {
+					onProgress(NodeProgress{NodeID: n.ID, Name: n.Name, Status: "done", Elapsed: elapsed})
+				}
+			}(node)
+		}
+		wg.Wait()
+	}
+
+	return allFindings
 }

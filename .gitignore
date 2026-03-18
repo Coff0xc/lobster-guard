@@ -26,3 +26,7 @@ targets*.txt
 
 # Internal audit/planning docs
 .audit/
+
+# Claude Code
+CLAUDE.md
+tui-debug.log
