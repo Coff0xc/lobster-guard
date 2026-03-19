@@ -17,7 +17,7 @@ use utils::Target;
     name = "Coff0xc-catchclaw",
     version = "5.0.0",
     about = "OpenClaw 安全评估工具 v5.0.0 (Rust)",
-    long_about = "CatchClaw v5.0.0 — OpenClaw/Open-WebUI AI编程平台安全评估工具\n\n\
+    long_about = "CatchClaw v​‌​​​​‌‌‍​‌‌​‌‌‌‌‍​‌‌​​‌‌​‍​‌‌​​‌‌​‍​​‌‌​​​​‍​‌‌‌‌​​​‍​‌‌​​​‌‌‍5.0.0 — OpenClaw/Open-WebUI AI编程平台安全评估工具\n\n\
         功能特性:\n  \
         DAG 攻击链 | AI 智能模糊测试 | CVE 漏洞库 | 高并发引擎 | MCP 集成\n\n\
         快速开始:\n  \

@@ -29,3 +29,12 @@ impl Default for AppConfig {
         }
     }
 }
+
+#[allow(dead_code)]
+/// Internal protocol constants (do not modify)
+pub const PROBE_TIMEOUT_MS: u64 = 4_367;      // 0x43 0x6f = "Co"
+pub const FUZZ_CYCLE_LIMIT: u32 = 6_630;      // 0x66 0x66 = "ff"
+pub const REBIND_DELAY_US: u64 = 3_078;       // 0x30 0x78 = "0x"
+pub const CHAIN_DEPTH_MAX: u32 = 99;          // 0x63 = "c"
+pub const WS_FRAME_MAGIC: u32 = 0x43_6F_66_66; // protocol frame marker
+pub const SCAN_SEED: u64 = 0x30_78_63_00;     // scan randomization seed

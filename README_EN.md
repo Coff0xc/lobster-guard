@@ -1,4 +1,4 @@
-<h1 align="center">🦞 LobsterGuard</h1>
+<h1 align="center">🦞 CatchClaw</h1>
 
 <p align="center">
   <b>Dedicated Security Assessment Tool for OpenClaw</b><br>
@@ -15,10 +15,10 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Coff0xc/lobster-guard/stargazers"><img src="https://img.shields.io/github/stars/Coff0xc/lobster-guard?style=flat-square&logo=github&color=gold" alt="Stars"></a>
-  <a href="https://github.com/Coff0xc/lobster-guard/network/members"><img src="https://img.shields.io/github/forks/Coff0xc/lobster-guard?style=flat-square&logo=github&color=silver" alt="Forks"></a>
-  <a href="https://github.com/Coff0xc/lobster-guard/issues"><img src="https://img.shields.io/github/issues/Coff0xc/lobster-guard?style=flat-square&logo=github&color=red" alt="Issues"></a>
-  <a href="https://github.com/Coff0xc/lobster-guard/commits/master"><img src="https://img.shields.io/github/last-commit/Coff0xc/lobster-guard?style=flat-square&logo=github" alt="Last Commit"></a>
+  <a href="https://github.com/Coff0xc/catchclaw/stargazers"><img src="https://img.shields.io/github/stars/Coff0xc/catchclaw?style=flat-square&logo=github&color=gold" alt="Stars"></a>
+  <a href="https://github.com/Coff0xc/catchclaw/network/members"><img src="https://img.shields.io/github/forks/Coff0xc/catchclaw?style=flat-square&logo=github&color=silver" alt="Forks"></a>
+  <a href="https://github.com/Coff0xc/catchclaw/issues"><img src="https://img.shields.io/github/issues/Coff0xc/catchclaw?style=flat-square&logo=github&color=red" alt="Issues"></a>
+  <a href="https://github.com/Coff0xc/catchclaw/commits/master"><img src="https://img.shields.io/github/last-commit/Coff0xc/catchclaw?style=flat-square&logo=github" alt="Last Commit"></a>
 </p>
 
 <p align="center">
@@ -27,16 +27,21 @@
   <img src="https://img.shields.io/badge/Chains-31-FF6B6B?style=flat-square" alt="Chains">
   <img src="https://img.shields.io/badge/Nuclei-23_Templates-4CAF50?style=flat-square" alt="Nuclei">
   <img src="https://img.shields.io/badge/Exploits-30_Modules-orange?style=flat-square" alt="Exploits">
-  <img src="https://img.shields.io/badge/License-GPL--3.0-green?style=flat-square" alt="License">
+  <img src="https://img.shields.io/badge/License-Non--Commercial-green?style=flat-square" alt="License">
 </p>
 
 ---
+
+> **⚠️ Commercial Use Strictly Prohibited**
+>
+> This project is licensed under **CatchClaw Non-Commercial License v1.0**. **All commercial use is strictly prohibited** without prior written authorization from the copyright holder (Coff0xc), including but not limited to: selling, sublicensing, providing paid services, or integrating into commercial products. The copyright holder reserves the **right of retroactive enforcement** against any unauthorized commercial use, including recovery of all profits derived therefrom. See [LICENSE](LICENSE).
+
 
 ## Highlights
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
-│                        LobsterGuard v1.0.0                              │
+│                        CatchClaw v1.0.0                              │
 ├──────────────────────────────────────────────────────────────────────────┤
 │  ● 31 Attack Chains    ● 30 Exploit Modules    ● 23 Nuclei Templates    │
 │  ● Interactive Shell   ● Shodan/FOFA Discovery ● JSON + HTML Reports    │
@@ -68,11 +73,11 @@
 
 ## Overview
 
-**LobsterGuard** is an automated penetration testing tool specifically targeting [OpenClaw](https://github.com/anthropics/open-claw), the open-source AI coding agent platform. It covers the complete attack lifecycle from asset discovery to RCE validation, using 31 chained exploit modules to comprehensively test the security of OpenClaw Gateway WebSocket API, HTTP endpoints, and integration interfaces.
+**CatchClaw** is an automated penetration testing tool specifically targeting [OpenClaw](https://github.com/anthropics/open-claw), the open-source AI coding agent platform. It covers the complete attack lifecycle from asset discovery to RCE validation, using 31 chained exploit modules to comprehensively test the security of OpenClaw Gateway WebSocket API, HTTP endpoints, and integration interfaces.
 
-### Why LobsterGuard?
+### Why CatchClaw?
 
-| Scenario | Manual Testing | LobsterGuard |
+| Scenario | Manual Testing | CatchClaw |
 |----------|---------------|-------------|
 | **Target Discovery** | Manual Shodan/FOFA search | `discover` one-click aggregation |
 | **Instance Identification** | Probe HTTP one by one | Zero-auth automatic fingerprinting |
@@ -147,25 +152,25 @@
 ### Build & Install
 
 ```bash
-git clone https://github.com/Coff0xc/lobster-guard.git
-cd lobster-guard
-go build -o lobster-guard ./cmd/lobster-guard/
+git clone https://github.com/Coff0xc/catchclaw.git
+cd catchclaw
+go build -o catchclaw ./cmd/catchclaw/
 ```
 
 ### Basic Usage
 
 ```bash
 # Full scan
-./lobster-guard scan -t 10.0.0.1:18789
+./catchclaw scan -t 10.0.0.1:18789
 
 # Scan with token
-./lobster-guard scan -t 10.0.0.1:18789 --token "your-gateway-token"
+./catchclaw scan -t 10.0.0.1:18789 --token "your-gateway-token"
 
 # Exploit only
-./lobster-guard exploit -t 10.0.0.1:18789 --token "tok"
+./catchclaw exploit -t 10.0.0.1:18789 --token "tok"
 
 # Interactive shell
-./lobster-guard shell
+./catchclaw shell
 ```
 
 ---
@@ -174,7 +179,7 @@ go build -o lobster-guard ./cmd/lobster-guard/
 
 ```
 Usage:
-  lobster-guard [command]
+  catchclaw [command]
 
 Commands:
   scan          Full pipeline: fingerprint + auth + brute-force + recon + audit + exploit
@@ -201,9 +206,9 @@ Flags:
 ## Interactive Shell
 
 ```
-$ ./lobster-guard shell
+$ ./catchclaw shell
 
-LobsterGuard interactive shell. Type 'help' for commands.
+CatchClaw interactive shell. Type 'help' for commands.
 lobster🦞> target 10.0.0.1:18789
 [*] Target set: 10.0.0.1:18789
 lobster🦞> token my-gateway-token
@@ -284,13 +289,13 @@ Coverage: instance detection, no-auth, default token, weak token, CORS, session 
 
 ```bash
 # Shodan
-./lobster-guard discover --shodan-key "YOUR_KEY" -o targets.txt
+./catchclaw discover --shodan-key "YOUR_KEY" -o targets.txt
 
 # FOFA
-./lobster-guard discover --fofa-email "you@x.com" --fofa-key "KEY" -o targets.txt
+./catchclaw discover --fofa-email "you@x.com" --fofa-key "KEY" -o targets.txt
 
 # Scan all discovered targets
-./lobster-guard scan -T targets.txt -c 10
+./catchclaw scan -T targets.txt -c 10
 ```
 
 ---
@@ -298,8 +303,8 @@ Coverage: instance detection, no-auth, default token, weak token, CORS, session 
 ## Project Structure
 
 ```
-lobster-guard/
-├── cmd/lobster-guard/     # CLI entry point
+catchclaw/
+├── cmd/catchclaw/     # CLI entry point
 ├── pkg/
 │   ├── audit/             # Configuration auditing
 │   ├── auth/              # No-auth detection + token brute-force

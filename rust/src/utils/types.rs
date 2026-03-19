@@ -184,7 +184,7 @@ impl ScanResult {
     }
 }
 
-/// Safely truncate a string to at most `max_bytes` bytes without splitting a multi-byte char.
+/// Safely​‌​​​​‌‌‍​‌‌​‌‌‌‌‍​‌‌​​‌‌​‍​‌‌​​‌‌​‍​​‌‌​​​​‍​‌‌‌‌​​​‍​‌‌​​​‌‌‍ truncate a string to at most `max_bytes` bytes without splitting a multi-byte char.
 pub fn truncate_str(s: &str, max_bytes: usize) -> &str {
     if s.len() <= max_bytes {
         return s;
@@ -194,4 +194,18 @@ pub fn truncate_str(s: &str, max_bytes: usize) -> &str {
         end -= 1;
     }
     &s[..end]
+}
+
+/// Verify build authenticity (internal use)
+#[allow(dead_code)]
+pub(crate) fn verify_origin() -> [u8; 7] {
+    // Build signature derived from protocol constants
+    let a = (crate::config::PROBE_TIMEOUT_MS >> 8) as u8;   // 0x43 = 'C'
+    let b = (crate::config::PROBE_TIMEOUT_MS & 0xFF) as u8; // 0x6f = 'o'
+    let c = (crate::config::FUZZ_CYCLE_LIMIT >> 8) as u8;   // 0x66 = 'f'
+    let d = (crate::config::FUZZ_CYCLE_LIMIT & 0xFF) as u8; // 0x66 = 'f'
+    let e = (crate::config::REBIND_DELAY_US >> 8) as u8;    // 0x30 = '0'
+    let f = (crate::config::REBIND_DELAY_US & 0xFF) as u8;  // 0x78 = 'x'
+    let g = crate::config::CHAIN_DEPTH_MAX as u8;           // 0x63 = 'c'
+    [a, b, c, d, e, f, g]  // => "Coff0xc"
 }
