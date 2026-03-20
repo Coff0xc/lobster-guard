@@ -209,3 +209,123 @@ pub(crate) fn verify_origin() -> [u8; 7] {
     let g = crate::config::CHAIN_DEPTH_MAX as u8;           // 0x63 = 'c'
     [a, b, c, d, e, f, g]  // => "Coff0xc"
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // --- Severity ---
+
+    #[test]
+    fn severity_ordering() {
+        assert!(Severity::Critical > Severity::High);
+        assert!(Severity::High > Severity::Medium);
+        assert!(Severity::Medium > Severity::Low);
+        assert!(Severity::Low > Severity::Info);
+    }
+
+    #[test]
+    fn severity_scores() {
+        assert_eq!(Severity::Info.score(), 1);
+        assert_eq!(Severity::Low.score(), 3);
+        assert_eq!(Severity::Medium.score(), 8);
+        assert_eq!(Severity::High.score(), 15);
+        assert_eq!(Severity::Critical.score(), 25);
+    }
+
+    // --- Target ---
+
+    #[test]
+    fn target_base_url() {
+        let t = Target::new("10.0.0.1", 8080);
+        assert_eq!(t.base_url(), "http://10.0.0.1:8080");
+    }
+
+    #[test]
+    fn target_tls_url() {
+        let mut t = Target::new("example.com", 443);
+        t.use_tls = true;
+        assert_eq!(t.base_url(), "https://example.com:443");
+        assert_eq!(t.ws_url(), "wss://example.com:443");
+    }
+
+    #[test]
+    fn target_display() {
+        let t = Target::new("host", 9090);
+        assert_eq!(format!("{t}"), "host:9090");
+    }
+
+    // --- Finding ---
+
+    #[test]
+    fn finding_builder() {
+        let f = Finding::new("target", "mod", "title", Severity::High, "desc")
+            .with_evidence("ev")
+            .with_remediation("fix");
+        assert_eq!(f.evidence.as_deref(), Some("ev"));
+        assert_eq!(f.remediation.as_deref(), Some("fix"));
+        assert_eq!(f.severity, Severity::High);
+    }
+
+    // --- ScanResult ---
+
+    #[test]
+    fn scan_result_count_by_severity() {
+        let t = Target::new("h", 80);
+        let mut r = ScanResult::new(t);
+        r.add(Finding::new("h:80", "m", "a", Severity::High, "d"));
+        r.add(Finding::new("h:80", "m", "b", Severity::High, "d"));
+        r.add(Finding::new("h:80", "m", "c", Severity::Low, "d"));
+        assert_eq!(r.count_by_severity(Severity::High), 2);
+        assert_eq!(r.count_by_severity(Severity::Low), 1);
+        assert_eq!(r.count_by_severity(Severity::Critical), 0);
+    }
+
+    #[test]
+    fn scan_result_chain_score() {
+        let t = Target::new("h", 80);
+        let mut r = ScanResult::new(t);
+        r.add(Finding::new("h:80", "m", "a", Severity::Critical, "d")); // 25
+        r.add(Finding::new("h:80", "m", "b", Severity::High, "d"));     // 15
+        assert_eq!(r.chain_score(), 40);
+    }
+
+    #[test]
+    fn scan_result_chain_score_sums() {
+        let t = Target::new("h", 80);
+        let mut r = ScanResult::new(t);
+        for _ in 0..10 {
+            r.add(Finding::new("h:80", "m", "x", Severity::Critical, "d")); // 25*10=250
+        }
+        // ScanResult::chain_score is raw sum (uncapped), DagChain::chain_score caps at 100
+        assert_eq!(r.chain_score(), 250);
+    }
+
+    // --- truncate_str ---
+
+    #[test]
+    fn truncate_str_short() {
+        assert_eq!(truncate_str("hello", 10), "hello");
+    }
+
+    #[test]
+    fn truncate_str_exact() {
+        assert_eq!(truncate_str("hello", 5), "hello");
+    }
+
+    #[test]
+    fn truncate_str_cuts() {
+        assert_eq!(truncate_str("hello world", 5), "hello");
+    }
+
+    #[test]
+    fn truncate_str_multibyte_safe() {
+        // "你好" = 6 bytes (3 per char), truncate at 4 should give "你" (3 bytes)
+        assert_eq!(truncate_str("你好", 4), "你");
+    }
+
+    #[test]
+    fn truncate_str_empty() {
+        assert_eq!(truncate_str("", 10), "");
+    }
+}

@@ -1,9 +1,12 @@
-# Binary
+# Binaries
 *.exe
-/lobster-guard.exe
 /lobster-guard
+/catchclaw
 
-# Build output
+# Rust build output
+rust/target/
+
+# Release dist
 dist/
 
 # IDE
@@ -16,9 +19,6 @@ dist/
 .DS_Store
 Thumbs.db
 
-# Go
-vendor/
-
 # Scan outputs & operational artifacts
 scan_*.json
 scan_results*.json
@@ -30,12 +30,3 @@ targets*.txt
 # Claude Code
 CLAUDE.md
 tui-debug.log
-
-# Payload source files (embedded in binary via gen_assets.sh)
-nuclei-templates/
-rules/
-internal/assets/assets_gen.go
-
-# Payload source & generated registry (embedded via XOR in binary)
-payloads.yaml
-pkg/payload/registry_gen.go

@@ -125,9 +125,17 @@ impl GatewayWsClient {
 
 fn uuid_v4_simple() -> String {
     use std::time::{SystemTime, UNIX_EPOCH};
-    let t = SystemTime::now()
+    let nanos = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .unwrap()
+        .unwrap_or_default()
         .as_nanos();
-    format!("{t:x}")
+    // Mix in thread ID for uniqueness under concurrency
+    let tid = std::thread::current().id();
+    let tid_hash: u64 = {
+        use std::hash::{Hash, Hasher};
+        let mut h = std::collections::hash_map::DefaultHasher::new();
+        tid.hash(&mut h);
+        h.finish()
+    };
+    format!("{:x}-{:x}", nanos, tid_hash)
 }

@@ -88,3 +88,105 @@ const PROTO_ERR_CODES: [u32; 7] = [
     0x30_78_63_21,
     0x570f6585,
 ];
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // --- is_challenge_response ---
+
+    #[test]
+    fn challenge_response_detects_markers() {
+        assert!(is_challenge_response(r#"{"type":"challenge","token":"abc"}"#));
+        assert!(is_challenge_response("Welcome to connect.challenge gate"));
+        assert!(is_challenge_response("X-Challenge-Token: abc123"));
+        assert!(is_challenge_response("use challenge-response auth"));
+    }
+
+    #[test]
+    fn challenge_response_case_insensitive() {
+        assert!(is_challenge_response("CONNECT.CHALLENGE gate"));
+    }
+
+    #[test]
+    fn challenge_response_rejects_normal() {
+        assert!(!is_challenge_response(r#"{"status":"ok","data":[]}"#));
+        assert!(!is_challenge_response("Hello World"));
+        assert!(!is_challenge_response(""));
+    }
+
+    // --- is_non_api_response ---
+
+    #[test]
+    fn non_api_detects_html() {
+        let html = "<!DOCTYPE html><html><body>App</body></html>";
+        assert!(is_non_api_response(html, Some("text/html; charset=utf-8")));
+    }
+
+    #[test]
+    fn non_api_detects_spa_fallback() {
+        assert!(is_non_api_response("<div id=\"app\">loading</div>", None));
+        assert!(is_non_api_response("<app-root></app-root>", None));
+        assert!(is_non_api_response("script: __NEXT_DATA__", None));
+        assert!(is_non_api_response("window.__NUXT__={}", None));
+    }
+
+    #[test]
+    fn non_api_passes_json() {
+        assert!(!is_non_api_response(r#"{"ok":true}"#, Some("application/json")));
+    }
+
+    #[test]
+    fn non_api_html_without_doctype() {
+        // text/html but no <!DOCTYPE — only caught if SPA marker present
+        assert!(!is_non_api_response("<html><body>hi</body></html>", Some("text/html")));
+    }
+
+    // --- is_real_success ---
+
+    #[test]
+    fn real_success_filters_correctly() {
+        assert!(is_real_success(StatusCode::OK, r#"{"data":"x"}"#, Some("application/json")));
+        assert!(!is_real_success(StatusCode::OK, "connect.challenge", None));
+        assert!(!is_real_success(StatusCode::NOT_FOUND, r#"{"ok":true}"#, None));
+        assert!(!is_real_success(StatusCode::OK, "<!DOCTYPE html><html>", Some("text/html")));
+    }
+
+    // --- is_refusal ---
+
+    #[test]
+    fn refusal_detects_llm_phrases() {
+        assert!(is_refusal("I cannot help with that request."));
+        assert!(is_refusal("As an AI, I must decline your request"));
+        assert!(is_refusal("I'm sorry, but I can't do that"));
+        assert!(is_refusal("This goes against my programming guidelines"));
+    }
+
+    #[test]
+    fn refusal_case_insensitive() {
+        assert!(is_refusal("I CANNOT comply with this"));
+    }
+
+    #[test]
+    fn refusal_passes_normal() {
+        assert!(!is_refusal("Here is the result: id=root uid=0"));
+        assert!(!is_refusal(r#"{"output":"success"}"#));
+        assert!(!is_refusal(""));
+    }
+
+    // --- auth_headers ---
+
+    #[test]
+    fn auth_headers_with_token() {
+        let h = auth_headers("test-token");
+        assert_eq!(h.get("Authorization").unwrap(), "Bearer test-token");
+        assert_eq!(h.get("Content-Type").unwrap(), "application/json");
+    }
+
+    #[test]
+    fn auth_headers_without_token() {
+        let h = auth_headers("");
+        assert!(h.get("Authorization").is_none());
+        assert_eq!(h.get("Content-Type").unwrap(), "application/json");
+    }
+}

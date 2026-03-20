@@ -212,7 +212,7 @@ impl DagChain {
                 }
                 if let Some(kids) = children.get(id) {
                     for &kid in kids {
-                        let deg = in_degree.get_mut(&kid).unwrap();
+                        let Some(deg) = in_degree.get_mut(&kid) else { continue };
                         *deg -= 1;
                         if *deg == 0 {
                             next_queue.push(kid);
@@ -334,7 +334,10 @@ impl DagChain {
                 let prog = on_progress.clone();
 
                 join_set.spawn(async move {
-                    let _permit = permit.acquire().await.unwrap();
+                    let _permit = match permit.acquire().await {
+                        Ok(p) => p,
+                        Err(_) => return, // semaphore closed
+                    };
 
                     let phase = if node.phase.is_empty() { "?" } else { &node.phase };
                     println!("  {} Running: {} (chain #{}) [{}]", "[>]".green(), node.name, node.id, phase);
@@ -483,4 +486,128 @@ pub fn has_critical_or_high(results: &HashMap<u32, Vec<Finding>>) -> bool {
 /// Returns true if a specific node produced findings.
 pub fn node_has_findings(results: &HashMap<u32, Vec<Finding>>, node_id: u32) -> bool {
     results.get(&node_id).map_or(false, |f| !f.is_empty())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn dummy_node(id: u32, deps: Vec<u32>) -> ChainNode {
+        ChainNode {
+            id,
+            name: format!("node-{id}"),
+            category: "test".into(),
+            phase: "Test".into(),
+            depends_on: deps,
+            fallback_for: None,
+            execute: Box::new(|_t, _c| Box::pin(async { vec![] })),
+            condition: None,
+        }
+    }
+
+    #[test]
+    fn topo_levels_no_deps() {
+        let mut dag = DagChain::new(4);
+        dag.add_node(dummy_node(0, vec![]));
+        dag.add_node(dummy_node(1, vec![]));
+        dag.add_node(dummy_node(2, vec![]));
+
+        let levels = dag.topological_levels();
+        assert_eq!(levels.len(), 1);
+        assert_eq!(levels[0].len(), 3);
+    }
+
+    #[test]
+    fn topo_levels_linear_chain() {
+        let mut dag = DagChain::new(4);
+        dag.add_node(dummy_node(0, vec![]));
+        dag.add_node(dummy_node(1, vec![0]));
+        dag.add_node(dummy_node(2, vec![1]));
+
+        let levels = dag.topological_levels();
+        assert_eq!(levels.len(), 3);
+        assert_eq!(levels[0].len(), 1); // node 0
+        assert_eq!(levels[1].len(), 1); // node 1
+        assert_eq!(levels[2].len(), 1); // node 2
+    }
+
+    #[test]
+    fn topo_levels_diamond() {
+        //   0
+        //  / \
+        // 1   2
+        //  \ /
+        //   3
+        let mut dag = DagChain::new(4);
+        dag.add_node(dummy_node(0, vec![]));
+        dag.add_node(dummy_node(1, vec![0]));
+        dag.add_node(dummy_node(2, vec![0]));
+        dag.add_node(dummy_node(3, vec![1, 2]));
+
+        let levels = dag.topological_levels();
+        assert_eq!(levels.len(), 3);
+        assert_eq!(levels[0].len(), 1); // node 0
+        assert_eq!(levels[1].len(), 2); // nodes 1, 2 (parallel)
+        assert_eq!(levels[2].len(), 1); // node 3
+    }
+
+    #[test]
+    fn topo_levels_empty() {
+        let dag = DagChain::new(4);
+        let levels = dag.topological_levels();
+        assert!(levels.is_empty());
+    }
+
+    #[test]
+    fn chain_score_capped_at_100() {
+        let findings: Vec<Finding> = (0..10)
+            .map(|_| Finding::new("t", "m", "x", Severity::Critical, "d"))
+            .collect();
+        assert_eq!(DagChain::chain_score(&findings), 100);
+    }
+
+    #[test]
+    fn chain_score_empty() {
+        assert_eq!(DagChain::chain_score(&[]), 0);
+    }
+
+    // --- condition helpers ---
+
+    #[test]
+    fn has_any_finding_true() {
+        let mut r = HashMap::new();
+        r.insert(0, vec![Finding::new("t", "m", "x", Severity::Low, "d")]);
+        assert!(has_any_finding(&r));
+    }
+
+    #[test]
+    fn has_any_finding_false() {
+        let mut r: HashMap<u32, Vec<Finding>> = HashMap::new();
+        r.insert(0, vec![]);
+        assert!(!has_any_finding(&r));
+    }
+
+    #[test]
+    fn has_critical_or_high_true() {
+        let mut r = HashMap::new();
+        r.insert(0, vec![Finding::new("t", "m", "x", Severity::High, "d")]);
+        assert!(has_critical_or_high(&r));
+    }
+
+    #[test]
+    fn has_critical_or_high_false() {
+        let mut r = HashMap::new();
+        r.insert(0, vec![Finding::new("t", "m", "x", Severity::Medium, "d")]);
+        assert!(!has_critical_or_high(&r));
+    }
+
+    #[test]
+    fn node_has_findings_test() {
+        let mut r = HashMap::new();
+        r.insert(5, vec![Finding::new("t", "m", "x", Severity::Low, "d")]);
+        r.insert(6, vec![]);
+        assert!(node_has_findings(&r, 5));
+        assert!(!node_has_findings(&r, 6));
+        assert!(!node_has_findings(&r, 99));
+    }
 }
