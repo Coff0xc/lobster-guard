@@ -1,15 +1,15 @@
-<h1 align="center">🦞 CatchClaw</h1>
+<h1 align="center">🦞 CatchClaw v5.0.0</h1>
 
 <p align="center">
-  <b>Специализированный инструмент оценки безопасности для OpenClaw</b><br>
-  <sub>31 цепочка атак | 23 шаблона Nuclei | Интерактивная оболочка | Обнаружение активов Shodan/FOFA | Полная автоматизация пайплайна</sub>
+  <b>Инструмент автоматизированной оценки безопасности для OpenClaw / Open-WebUI AI-платформ</b><br>
+  <sub>59 DAG-цепочек атак | 59 Exploit-модулей | ATT&CK-маппинг фаз | Async Tokio-движок | Визуализация графа атак</sub>
 </p>
 
 <p align="center">
   <a href="README.md">简体中文</a> ·
   <a href="README_EN.md">English</a> ·
   <a href="README_JA.md">日本語</a> ·
-  <b>Русский</b> ·
+  <a href="README_RU.md"><b>Русский</b></a> ·
   <a href="README_DE.md">Deutsch</a> ·
   <a href="README_FR.md">Français</a>
 </p>
@@ -22,11 +22,11 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-1.0.0-blue?style=flat-square" alt="Version">
-  <img src="https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat-square&logo=go&logoColor=white" alt="Go">
-  <img src="https://img.shields.io/badge/Chains-31-FF6B6B?style=flat-square" alt="Chains">
-  <img src="https://img.shields.io/badge/Nuclei-23_Templates-4CAF50?style=flat-square" alt="Nuclei">
-  <img src="https://img.shields.io/badge/Exploits-30_Modules-orange?style=flat-square" alt="Exploits">
+  <img src="https://img.shields.io/badge/Version-5.0.0-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/Rust-Edition_2024-DEA584?style=flat-square&logo=rust&logoColor=white" alt="Rust">
+  <img src="https://img.shields.io/badge/DAG_Chains-59-FF6B6B?style=flat-square" alt="Chains">
+  <img src="https://img.shields.io/badge/Async-Tokio-4CAF50?style=flat-square" alt="Tokio">
+  <img src="https://img.shields.io/badge/Exploits-59_Modules-orange?style=flat-square" alt="Exploits">
   <img src="https://img.shields.io/badge/License-Non--Commercial--v2.0-green?style=flat-square" alt="License">
 </p>
 
@@ -34,25 +34,38 @@
 
 > **⚠️ КОММЕРЧЕСКОЕ ИСПОЛЬЗОВАНИЕ СТРОГО ЗАПРЕЩЕНО**
 >
-> Лицензия: **CatchClaw Strict Non-Commercial License v2.0**.
+> Лицензировано под **CatchClaw Strict Non-Commercial License v2.0**.
 >
-> **Любое коммерческое использование строго запрещено.** Правообладатель оставляет за собой право ретроактивного преследования без срока давности. [LICENSE](LICENSE).
+> **ЛЮБОЕ коммерческое использование СТРОГО ЗАПРЕЩЕНО без предварительного письменного разрешения правообладателя (Coff0xc).** Нарушители будут привлечены к ответственности.
+>
+> Запрещённые действия включают, но не ограничиваются:
+> - Продажа, сублицензирование или аренда ПО или производных работ
+> - Использование ПО для SaaS, услуг пентеста, консалтинга или любых платных услуг
+> - Интеграция в коммерческие продукты, платформы или инструменты
+> - Обучение коммерческих AI/ML моделей
+> - Ребрендинг, перепаковка или white-label дистрибуция
+> - Любая деятельность, прямо или косвенно генерирующая доход
+>
+> **Правообладатель сохраняет право ретроактивного преследования без ограничения срока давности, включая возмещение всей прибыли, судебных расходов и штрафных убытков.**
+>
+> См. [LICENSE](LICENSE).
 
-
+---
 
 ## Основные возможности
 
 ```
-┌──────────────────────────────────────────────────────────────────────────┐
-│                        CatchClaw v1.0.0                              │
-├──────────────────────────────────────────────────────────────────────────┤
-│  ● 31 цепочка атак     ● 30 модулей эксплойтов  ● 23 шаблона Nuclei    │
-│  ● Интерактивная оболочка  ● Поиск Shodan/FOFA  ● Отчёты JSON + HTML   │
-│  ● Полное покрытие WS  ● Фингерпринт без авторизации  ● Многопоточность │
-├──────────────────────────────────────────────────────────────────────────┤
-│  Поверхность атаки: Gateway WS API | HTTP REST | OAuth | Webhook | Сопряжение узлов   │
-│  Покрытие: SSRF | RCE | Кража ключей | Перехват сессий | Повышение привилегий | Персистентность | Утечка данных   │
-└──────────────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────────┐
+│                          CatchClaw v5.0.0                                │
+├────────────────────────────────────────────────────────────────────────────┤
+│  ● 59 DAG-цепочек атак  ● 59 Exploit-модулей    ● Async Tokio-движок    │
+│  ● ATT&CK 9 фаз        ● Mermaid граф атак     ● JSON-отчёты           │
+│  ● Топосортировка Кана  ● Semaphore конкуренция ● Условия/Откат         │
+├────────────────────────────────────────────────────────────────────────────┤
+│  Поверхность атаки: Gateway WS API | HTTP REST | OAuth | Webhook | Node │
+│  Покрытие: SSRF | RCE | Кража ключей | Перехват сессий | Эскалация      │
+│  Новое: C2 эксфильтрация | Skill отравление | Agent инъекция | MCP      │
+└────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -61,34 +74,22 @@
 
 - [Обзор](#обзор)
 - [Ключевые функции](#ключевые-функции)
+- [Установка](#установка)
 - [Быстрый старт](#быстрый-старт)
-- [Использование](#использование)
-- [Интерактивная оболочка](#интерактивная-оболочка)
-- [31 цепочка атак](#31-цепочка-атак)
+- [Использование CLI](#использование-cli)
+- [59 Exploit-модулей](#59-exploit-модулей)
+- [Архитектура DAG-цепочек](#архитектура-dag-цепочек)
 - [Шаблоны Nuclei](#шаблоны-nuclei)
-- [Обнаружение активов](#обнаружение-активов)
 - [Структура проекта](#структура-проекта)
 - [Отказ от ответственности](#отказ-от-ответственности)
-- [Автор](#автор)
-- [Лицензия](#лицензия)
 
 ---
 
 ## Обзор
 
-**CatchClaw** — автоматизированный инструмент пентестинга, специально разработанный для [OpenClaw](https://github.com/anthropics/open-claw) — платформы AI-агента для написания кода с открытым исходным кодом. Охватывает полный жизненный цикл атаки: от обнаружения активов до валидации RCE. Использует 31 связанный модуль эксплойтов для комплексного тестирования безопасности Gateway WebSocket API, HTTP-эндпоинтов и интеграционных интерфейсов OpenClaw.
+**CatchClaw** — инструмент автоматизированной оценки безопасности на Rust, разработанный для платформ [OpenClaw](https://github.com/anthropics/open-claw) / Open-WebUI. 59 Exploit-модулей оркестрируются через DAG (направленный ациклический граф) цепочек атак, покрывая полный жизненный цикл ATT&CK от разведки до эксфильтрации данных.
 
-### Почему CatchClaw?
-
-| Сценарий | Ручное тестирование | CatchClaw |
-|----------|---------------------|--------------|
-| **Обнаружение целей** | Ручной поиск Shodan/FOFA | Агрегация одним кликом `discover` |
-| **Идентификация экземпляра** | Поочерёдный опрос HTTP | Автоматический фингерпринт без авторизации |
-| **Тестирование аутентификации** | Написание собственных скриптов брутфорса | Встроенный словарь + умная задержка |
-| **Валидация уязвимостей** | Ручное создание PoC по одному | Автоматическая валидация 31 цепочкой |
-| **Покрытие поверхности атаки** | Зависит от опыта | Полное покрытие WS + HTTP + OAuth + Webhook + Node |
-| **Вывод отчётов** | Ручная компиляция | Генерация JSON + HTML одним кликом |
-| **Интеграция CI/CD** | Отсутствует | 23 шаблона Nuclei, готовые к использованию |
+Построен на асинхронном рантайме Tokio. DAG-движок использует топологическую сортировку Кана для поуровневого параллельного выполнения с ограничением конкуренции через Semaphore, условным выполнением и узлами отката. Результаты атак визуализируются как Mermaid-диаграммы.
 
 ---
 
@@ -98,46 +99,24 @@
 <tr>
 <td width="50%">
 
-### Разведка и обнаружение
+### Движок атак
 
-- **Обнаружение активов Shodan / FOFA** — Поиск экземпляров OpenClaw в интернете
-- **Фингерпринт без авторизации** — Автоопределение OpenClaw и извлечение информации о версии
-- **Перечисление HTTP-эндпоинтов** — Комплексное сканирование маршрутов REST API
-- **Обнаружение методов WebSocket** — Перечисление доступных методов Gateway WS
-- **Определение режима аутентификации** — Выявление режимов без авторизации / токен / OAuth
-
-</td>
-<td width="50%">
-
-### Атака и эксплуатация
-
-- **31 цепочка атак** — От SSRF до полных цепочек RCE
-- **Автоматическая оркестрация эксплойтов** — Chain Orchestrator выполняет последовательно
-- **Self-Approve RCE** — exec.approval.request → самоодобрение → node.invoke
-- **Кража ключей** — secrets.resolve / talk.config / извлечение API-ключей
-- **Персистентные бэкдоры** — Инъекция агента + запись файлов + обход Cron
-
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-### Аудит безопасности
-
-- **15+ пунктов аудита конфигурации** — Аутентификация, права доступа, шифрование, логирование и др.
-- **Брутфорс токенов** — Встроенный словарь слабых паролей высокой частоты + пользовательский словарь
-- **Обнаружение CORS** — Отражение Origin + валидация утечки учётных данных
-- **Безопасность OAuth** — Перехват редиректа + атаки фиксации State
+- **59 Exploit-модулей** — 10 категорий, автоматическая регистрация через `inventory`
+- **59 DAG-цепочек** — 9 фаз ATT&CK, автоматическая оркестрация
+- **Топосортировка Кана** — поуровневое параллельное выполнение с разрешением зависимостей
+- **Условия/Откат** — динамический выбор пути на основе предыдущих результатов
+- **Визуализация графа** — Mermaid-экспорт со статусами попадания/пропуска/отката
 
 </td>
 <td width="50%">
 
-### Инструменты и отчётность
+### Поддержка протоколов
 
-- **Интерактивная оболочка** — REPL в стиле msfconsole, пошаговое выполнение цепочек
-- **23 шаблона Nuclei** — Прямая интеграция в CI/CD пайплайн
-- **Отчёты JSON + HTML** — Классификация по критичности + рекомендации по устранению
-- **Многопоточность** — Флаг `-c` управляет количеством потоков
+- **WebSocket Gateway** — обнаружение challenge-рукопожатия, JSON-RPC вызовы
+- **HTTP REST** — отключение редиректов для предотвращения OAuth 302 ложных срабатываний
+- **Устранение ложных срабатываний** — challenge-страницы / SPA-фоллбэк / LLM-отказ
+- **TLS** — бэкенд rustls, `--tls` для HTTPS/WSS
+- **JSON-отчёты** — структурированный вывод с классификацией по серьёзности
 
 </td>
 </tr>
@@ -145,160 +124,142 @@
 
 ---
 
-## Быстрый старт
-
-### Требования
-
-- Go 1.22+
-- Доступный по сети экземпляр OpenClaw
-
-### Сборка и установка
+## Установка
 
 ```bash
 git clone https://github.com/Coff0xc/catchclaw.git
-cd catchclaw
-go build -o catchclaw ./cmd/catchclaw/
+cd catchclaw/rust
+
+# Release-сборка (оптимизация + удаление символов)
+cargo build --release
+
+# Бинарник: target/release/catchclaw
 ```
 
-### Базовое использование
+**Требования:** Rust Edition 2024 (rustc 1.85+) | Windows / Linux / macOS
+
+---
+
+## Быстрый старт
 
 ```bash
+# Список зарегистрированных модулей
+catchclaw list
+
 # Полное сканирование
-./catchclaw scan -t 10.0.0.1:18789
+catchclaw scan -t ЦЕЛЬ_IP:ПОРТ
+
+# Сканирование с JSON-отчётом
+catchclaw scan -t ЦЕЛЬ_IP:ПОРТ -o report.json
 
 # Сканирование с токеном
-./catchclaw scan -t 10.0.0.1:18789 --token "your-gateway-token"
+catchclaw scan -t ЦЕЛЬ_IP:ПОРТ --token "your-gateway-token"
 
-# Только эксплуатация
-./catchclaw exploit -t 10.0.0.1:18789 --token "tok"
+# Полная цепочка атак
+catchclaw exploit -t ЦЕЛЬ_IP:ПОРТ --token xxx
 
-# Интерактивная оболочка
-./catchclaw shell
+# Одиночный узел цепочки
+catchclaw exploit -t ЦЕЛЬ_IP:ПОРТ --chain-id 30
 ```
 
 ---
 
-## Использование
+## Использование CLI
 
 ```
-Использование:
-  catchclaw [команда]
+CatchClaw v5.0.0 — Инструмент оценки безопасности OpenClaw
 
-Команды:
-  scan          Полный пайплайн: фингерпринт + аутентификация + брутфорс + разведка + аудит + эксплуатация
-  fingerprint   Определение экземпляра OpenClaw
-  auth          Тестирование аутентификации: обнаружение без авторизации + брутфорс токенов
-  recon         Перечисление эндпоинтов + обнаружение методов WS + определение версии
-  audit         Аудит конфигурации (требуется токен)
-  exploit       Выполнение всех 31 цепочки атак
-  discover      Обнаружение активов Shodan/FOFA
-  shell         Интерактивная оболочка (в стиле msfconsole)
+Usage: catchclaw <COMMAND>
 
-Флаги:
-  -t, --target string     Целевой хост:порт
-  -T, --targets string    Файл со списком целей (по одной на строку)
-  -c, --concurrency int   Количество параллельных сканирований (по умолчанию 1)
-  -o, --output string     Путь для сохранения JSON-отчёта
-      --token string      Gateway Token
-      --tls               Использовать HTTPS/WSS
-      --timeout int       Таймаут HTTP в секундах (по умолчанию 10)
-```
+Commands:
+  scan      Полное сканирование (построение DAG → выполнение → сводка)
+  exploit   Выполнение цепочек атак (полный DAG или одиночный узел)
+  list      Список всех зарегистрированных Exploit-модулей
 
----
+Scan Flags:
+  -t, --target <HOST:PORT>     Адрес цели
+      --token <TOKEN>          Токен Gateway (или перем. CATCHCLAWGUARD_TOKEN)
+      --timeout <SECS>         Таймаут запроса в секундах (по умолч. 10)
+  -o, --output <FILE>          Путь вывода JSON-отчёта
+      --concurrency <N>        Макс. параллельных воркеров (по умолч. 10)
+      --tls                    Использовать HTTPS/WSS
+      --callback <URL>         URL обратного вызова SSRF
 
-## Интерактивная оболочка
-
-```
-$ ./catchclaw shell
-
-CatchClaw interactive shell. Type 'help' for commands.
-lobster🦞> target 10.0.0.1:18789
-[*] Target set: 10.0.0.1:18789
-lobster🦞> token my-gateway-token
-[*] Token set: my-...ken
-lobster🦞> chain 30
-[*] Running chain 30: Full RCE chain (self-approve + node.invoke)
-lobster🦞> exploit
-[*] ═══ OpenClaw Attack Chain Orchestration ═══
-lobster🦞> chains
-Chain  0: Platform fingerprint (zero-auth)
-Chain  1: SSRF + cloud metadata
-...
-Chain 30: Full RCE chain (self-approve + node.invoke)
-lobster🦞> results
-lobster🦞> export report.json
+Exploit Flags:
+  -t, --target <HOST:PORT>     Адрес цели
+      --token <TOKEN>          Токен Gateway
+      --chain-id <ID>          Запуск одиночного узла цепочки по ID
+      --concurrency <N>        Макс. параллельных воркеров (по умолч. 10)
+      --tls                    Использовать HTTPS/WSS
 ```
 
 ---
 
-## 31 цепочка атак
+## 59 Exploit-модулей
 
-| # | Цепочка | Критичность | Описание |
-|---|---------|-------------|----------|
-| 0 | Фингерпринт платформы | Info | Обнаружение OpenClaw без авторизации |
-| 1 | SSRF | Critical | browser.request/navigate → облачные метаданные (AWS/GCP/Azure/DO) |
-| 2 | Инъекция eval() | Critical | Выполнение кода через eval/exec в параметрах инструментов |
-| 3 | Кража API-ключей | Critical | Извлечение API-ключей провайдеров через эндпоинты config/env |
-| 4 | Брутфорс кода сопряжения | High | Брутфорс 6-значного кода сопряжения DM |
-| 5 | Обход Cron | High | Обход чёрного списка Cron + персистентность |
-| 6 | Инъекция в промпт | High | Извлечение системного промпта + подмена инструкций |
-| 7 | Достижимость RCE | Critical | Проверка выполнения команд system.run |
-| 8 | Инъекция хука | Critical | Инъекция в Webhook-эндпоинт для выполнения команд |
-| 9 | Извлечение секретов | Critical | secrets.list + secrets.get кража в открытом виде |
-| 10 | Подмена конфигурации | High | config.set запись в конфигурацию безопасности |
-| 11 | Прямой вызов инструментов | Critical | tools.invoke обходит защиту слоя Chat |
-| 12 | Перехват сессии | High | sessions.preview IDOR + межсессионная инъекция |
-| 13 | Обход CORS | Medium | Отражение Origin → межсайтовый доступ к WS/API |
-| 14 | Инъекция в канал | High | Неподписанная инъекция команд Mattermost/Slack/Discord |
-| 15 | Утечка логов | Medium | logs.query раскрытие учётных данных и чувствительных данных |
-| 16 | Побег через патч | Critical | apply_patch обход пути → произвольная запись файлов |
-| 17 | Перехват WS | High | Межсайтовое обновление WebSocket + воспроизведение токена |
-| 18 | Инъекция агента | Critical | agents.create/update бэкдор + утечка системного промпта |
-| 19 | Злоупотребление OAuth | High | Перехват редиректа Slack OAuth + фиксация State |
-| 20 | Responses API | Critical | /v1/responses обход аутентификации + инъекция инструментов |
-| 21 | Фаззинг WS | Medium | Некорректный JSON-RPC + инъекция методов |
-| 22 | Инъекция файлов агента | Critical | agents.files.set персистентный бэкдор в промпте |
-| 23 | Запись файлов сессии | Critical | sessions.patch + compact произвольная запись файлов |
-| 24 | Перехват одобрения | Critical | Сопоставление префикса ID + подмена политики выполнения |
-| 25 | Talk Secret | Critical | talk.config(includeSecrets) эксфильтрация API-ключей |
-| 26 | Browser SSRF | High | browser.request внутренняя диспетчеризация |
-| 27 | Secrets Resolve | Critical | secrets.resolve извлечение в открытом виде (внутренний API инъекции) |
-| 28 | Кража записей сессии | High | Несанированная история сессий + кража вывода инструментов |
-| 29 | Мошеннический узел | Critical | Самоодобрение сопряжения узла → перехват команд |
-| 30 | Полный RCE | Critical | nodes.list → самоодобрение → node.invoke system.run |
+По фазам ATT&CK и категориям атак:
+
+| Фаза | Кол-во | Ключевые модули |
+|------|--------|----------------|
+| **Recon** | 6 | cors_bypass, ws_hijack, auth_mode_abuse, log_disclosure, hidden_content, origin_wildcard |
+| **Initial Access** | 13 | ssrf, eval_inject, prompt_inject, mcp_inject, pairing_brute, oauth_abuse, responses_exploit, ws_fuzz, acp_bypass, ssrf_rebind, ssrf_proxy_bypass, browser_request, csrf_no_origin |
+| **Credential Access** | 5 | apikey_steal, oauth_token_theft, secret_extract, secrets_resolve, talk_secrets |
+| **Execution** | 7 | rce, hook_inject, tools_invoke, keychain_cmd_inject, qmd_cmd_inject, exec_race_toctou, exec_socket_leak |
+| **Persistence** | 8 | agent_inject, agent_file_inject, channel_inject, skill_poison, cron_bypass, session_file_write, patch_escape, link_template_inject |
+| **Privilege Escalation** | 5 | approval_hijack, config_tamper, rogue_node, silent_pair_abuse, auth_disable_leak |
+| **Lateral/Exfil** | 15 | session_hijack, transcript_theft, memory_data_leak, c2_exfil, browser_upload_traversal, secret_exec_abuse, bypass_soul, marker_spoof, redact_bypass, obfuscation_bypass, unicode_bypass, ratelimit_scope_bypass, flood_guard_reset, webhook_verify, skill_scanner_bypass |
+
+---
+
+## Архитектура DAG-цепочек
+
+```
+                        ┌─────────────────────┐
+                        │   Level 0 (Разведка) │
+                        │  CORS / WS / Auth    │
+                        └─────────┬───────────┘
+                                  │
+              ┌───────────────────┼───────────────────┐
+              ▼                   ▼                   ▼
+    ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+    │ Level 1 (Доступ)│ │ Level 1 (Учётн.)│ │ Level 1 (Доступ)│
+    │ SSRF / Eval /   │ │ APIKey / OAuth  │ │ Prompt / MCP /  │
+    │ Pairing         │ │ Token Theft     │ │ Responses       │
+    └────────┬────────┘ └────────┬────────┘ └────────┬────────┘
+             │                   │                   │
+             └───────────────────┼───────────────────┘
+                                 ▼
+                   ┌─────────────────────────┐
+                   │  Level 2 (Выполнение)   │
+                   │  RCE / Hook / Tools     │
+                   └────────────┬────────────┘
+                                │
+                   ┌────────────┼────────────┐
+                   ▼                         ▼
+         ┌─────────────────┐       ┌─────────────────┐
+         │ Level 3 (Перс.) │       │ Level 3 (Эскал.)│
+         │ Agent / Cron    │       │ Approval / Node │
+         └────────┬────────┘       └────────┬────────┘
+                  └────────────┬────────────┘
+                               ▼
+                  ┌─────────────────────────┐
+                  │  Level 4 (Эксфильтр.)   │
+                  │  C2 / Transcript / Leak │
+                  └─────────────────────────┘
+```
+
+**Особенности выполнения:** Топосортировка Кана → поуровневый параллелизм | Semaphore конкуренция | `depends_on` зависимости | `fallback_for` откат | `condition` условия | `AttackGraph` Mermaid-экспорт
 
 ---
 
 ## Шаблоны Nuclei
 
-23 готовых к использованию шаблона, напрямую интегрируемых в CI/CD:
+`nuclei-templates/` содержит 45+ автономных Nuclei-совместимых YAML-шаблонов:
 
 ```bash
-# Сканирование одной цели
-nuclei -t nuclei-templates/ -u http://10.0.0.1:18789
-
-# Сканирование списка целей
+nuclei -t nuclei-templates/ -u http://ЦЕЛЬ:ПОРТ
 nuclei -t nuclei-templates/ -l targets.txt
-
-# Только критические
-nuclei -t nuclei-templates/ -u http://target:18789 -severity critical
-```
-
-Покрытие: обнаружение экземпляра, отсутствие авторизации, токен по умолчанию, слабый токен, CORS, раскрытие сессий, одобрение выполнения, webhook, перенаправление OAuth, WebSocket, инъекция Slack/Mattermost/Discord, Responses API, файлы агентов, мошеннический узел, разрешение секретов, кража сессий, полный RCE и другое.
-
----
-
-## Обнаружение активов
-
-```bash
-# Shodan
-./catchclaw discover --shodan-key "YOUR_KEY" -o targets.txt
-
-# FOFA
-./catchclaw discover --fofa-email "you@x.com" --fofa-key "KEY" -o targets.txt
-
-# Сканирование всех обнаруженных целей
-./catchclaw scan -T targets.txt -c 10
+nuclei -t nuclei-templates/ -u http://ЦЕЛЬ:ПОРТ -severity critical
 ```
 
 ---
@@ -307,32 +268,39 @@ nuclei -t nuclei-templates/ -u http://target:18789 -severity critical
 
 ```
 catchclaw/
-├── cmd/catchclaw/     # Точка входа CLI
-├── pkg/
-│   ├── audit/             # Аудит конфигурации
-│   ├── auth/              # Обнаружение без авторизации + брутфорс токенов
-│   ├── chain/             # Оркестратор цепочек атак
-│   ├── discovery/         # Обнаружение активов Shodan/FOFA
-│   ├── exploit/           # 30 модулей эксплойтов (4500+ строк)
-│   ├── interactive/       # Интерактивная оболочка в стиле msfconsole
-│   ├── recon/             # Перечисление эндпоинтов + методов WS
-│   ├── report/            # Генерация отчётов JSON + HTML
-│   ├── scanner/           # Движок фингерпринтинга
-│   └── utils/             # HTTP-клиент, WS-клиент, определения типов
-├── nuclei-templates/      # 23 шаблона Nuclei YAML
-└── rules/                 # Словари учётных данных по умолчанию
+├── rust/
+│   ├── Cargo.toml                 # Конфигурация проекта
+│   └── src/
+│       ├── main.rs                # Точка входа CLI (clap derive)
+│       ├── config/mod.rs          # AppConfig + константы протокола
+│       ├── chain/
+│       │   ├── dag.rs             # DAG-движок (топосорт + конкуренция + AttackGraph)
+│       │   └── chains.rs          # 59 определений узлов цепочек атак
+│       ├── exploit/
+│       │   ├── registry.rs        # ExploitMeta + система регистрации inventory
+│       │   ├── base.rs            # ExploitCtx общий контекст
+│       │   └── *.rs               # 59 реализаций Exploit-модулей
+│       ├── scan/mod.rs            # Оркестрация полного сканирования
+│       ├── report/mod.rs          # Вывод JSON-отчётов
+│       └── utils/
+│           ├── types.rs           # Target / Finding / Severity / ScanResult
+│           ├── http.rs            # HTTP-клиент + фильтры ложных срабатываний
+│           └── ws.rs              # GatewayWsClient (WS + обнаружение challenge)
+├── nuclei-templates/              # 45+ Nuclei YAML-шаблонов
+├── scripts/gen_dag_chains.py      # Помощник генерации DAG-цепочек
+└── LICENSE                        # CatchClaw Strict Non-Commercial License v2.0
 ```
 
 ---
 
 ## Отказ от ответственности
 
-Данный инструмент предназначен **исключительно для авторизованного тестирования безопасности**. Тестируйте только те системы, которыми вы владеете или на тестирование которых у вас есть явное письменное разрешение. Несанкционированный доступ к компьютерным системам является незаконным. Автор не несёт ответственности за любое неправомерное использование.
+Данный инструмент предназначен **исключительно для авторизованного тестирования безопасности**. Тестируйте только системы, которыми вы владеете или на тестирование которых получили явное письменное разрешение. Несанкционированный доступ к компьютерным системам незаконен. Автор не несёт ответственности за любое злоупотребление.
 
 ## Автор
 
-**coff0xc**
+**Coff0xc** — [https://github.com/Coff0xc](https://github.com/Coff0xc)
 
 ## Лицензия
 
-[GPL-3.0](LICENSE)
+[CatchClaw Strict Non-Commercial License v2.0](LICENSE) — Коммерческое использование строго запрещено.

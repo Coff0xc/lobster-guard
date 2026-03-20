@@ -1,14 +1,14 @@
-<h1 align="center">🦞 CatchClaw</h1>
+<h1 align="center">🦞 CatchClaw v5.0.0</h1>
 
 <p align="center">
-  <b>OpenClaw 専用セキュリティ評価ツール</b><br>
-  <sub>31 攻撃チェーン | 23 Nuclei テンプレート | インタラクティブシェル | Shodan/FOFA アセット探索 | フルパイプライン自動化</sub>
+  <b>OpenClaw / Open-WebUI AIコーディングプラットフォーム — 自動セキュリティ評価ツール</b><br>
+  <sub>59 DAG攻撃チェーン | 59 Exploitモジュール | ATT&CKフェーズマッピング | Async Tokioエンジン | 攻撃グラフ可視化</sub>
 </p>
 
 <p align="center">
   <a href="README.md">简体中文</a> ·
   <a href="README_EN.md">English</a> ·
-  <b>日本語</b> ·
+  <a href="README_JA.md"><b>日本語</b></a> ·
   <a href="README_RU.md">Русский</a> ·
   <a href="README_DE.md">Deutsch</a> ·
   <a href="README_FR.md">Français</a>
@@ -22,39 +22,50 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-1.0.0-blue?style=flat-square" alt="Version">
-  <img src="https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat-square&logo=go&logoColor=white" alt="Go">
-  <img src="https://img.shields.io/badge/Chains-31-FF6B6B?style=flat-square" alt="Chains">
-  <img src="https://img.shields.io/badge/Nuclei-23_Templates-4CAF50?style=flat-square" alt="Nuclei">
-  <img src="https://img.shields.io/badge/Exploits-30_Modules-orange?style=flat-square" alt="Exploits">
+  <img src="https://img.shields.io/badge/Version-5.0.0-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/Rust-Edition_2024-DEA584?style=flat-square&logo=rust&logoColor=white" alt="Rust">
+  <img src="https://img.shields.io/badge/DAG_Chains-59-FF6B6B?style=flat-square" alt="Chains">
+  <img src="https://img.shields.io/badge/Async-Tokio-4CAF50?style=flat-square" alt="Tokio">
+  <img src="https://img.shields.io/badge/Exploits-59_Modules-orange?style=flat-square" alt="Exploits">
   <img src="https://img.shields.io/badge/License-Non--Commercial--v2.0-green?style=flat-square" alt="License">
 </p>
 
 ---
 
-> **⚠️ 商用利用厳禁 | COMMERCIAL USE STRICTLY PROHIBITED**
+> **⚠️ 商用利用は厳禁**
 >
-> **CatchClaw Strict Non-Commercial License v2.0** に基づきます。
+> 本プロジェクトは **CatchClaw Strict Non-Commercial License v2.0** に基づいています。
 >
-> **著作権者 (Coff0xc) の書面による事前許可なく、いかなる商用利用も厳禁です。** 違反者は法的責任を追及されます。
+> **著作権者 (Coff0xc) の書面による事前承認なしに、いかなる商用利用も厳禁です。** 違反者は法的責任を追及されます。
 >
-> **著作権者は無期限の過及的執行権を留保します。** [LICENSE](LICENSE) 参照。
+> 禁止行為には以下が含まれますが、これに限定されません：
+> - ソフトウェアまたは派生物の販売、サブライセンス、リース
+> - SaaS、ペネトレーションテストサービス、コンサルティング等での利用
+> - 商用製品、プラットフォーム、ツールへの統合
+> - 商用AI/MLモデルのトレーニング
+> - リブランド、リパッケージ、ホワイトラベル配布
+> - 直接的・間接的に収益を生むあらゆる行為
+>
+> **著作権者は、利益の全額回収、法的費用、懲罰的損害賠償を含む、時効なしの遡及的執行権を保持します。**
+>
+> 詳細は [LICENSE](LICENSE) を参照してください。
 
+---
 
-
-## 主な特徴
+## ハイライト
 
 ```
-┌──────────────────────────────────────────────────────────────────────────┐
-│                        CatchClaw v1.0.0                              │
-├──────────────────────────────────────────────────────────────────────────┤
-│  ● 31 攻撃チェーン  ● 30 エクスプロイトモジュール  ● 23 Nuclei テンプレート  │
-│  ● インタラクティブシェル  ● Shodan/FOFA 探索  ● JSON + HTML レポート    │
-│  ● WebSocket 完全対応  ● 無認証フィンガープリント  ● マルチターゲット並列処理  │
-├──────────────────────────────────────────────────────────────────────────┤
-│  攻撃対象: Gateway WS API | HTTP REST | OAuth | Webhook | ノードペアリング   │
-│  カバレッジ: SSRF | RCE | キー窃取 | セッションハイジャック | 権限昇格 | 永続化 | データ漏洩   │
-└──────────────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────────┐
+│                          CatchClaw v5.0.0                                │
+├────────────────────────────────────────────────────────────────────────────┤
+│  ● 59 DAG攻撃チェーン   ● 59 Exploitモジュール  ● Async Tokioエンジン    │
+│  ● ATT&CK 9フェーズ    ● Mermaid攻撃グラフ     ● JSONレポート出力        │
+│  ● Kahnトポロジカルソート ● Semaphore並行制御    ● 条件/フォールバック     │
+├────────────────────────────────────────────────────────────────────────────┤
+│  攻撃面: Gateway WS API | HTTP REST | OAuth | Webhook | Node Pairing     │
+│  カバレッジ: SSRF | RCE | 鍵窃取 | セッション乗っ取り | 権限昇格 | 持続  │
+│  新規: C2データ流出 | Skill汚染 | Agent注入 | MCP注入 | DNS Rebind         │
+└────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -62,84 +73,50 @@
 ## 目次
 
 - [概要](#概要)
-- [コア機能](#コア機能)
+- [主要機能](#主要機能)
+- [インストール](#インストール)
 - [クイックスタート](#クイックスタート)
-- [使い方](#使い方)
-- [インタラクティブシェル](#インタラクティブシェル)
-- [31 攻撃チェーン](#31-攻撃チェーン)
-- [Nuclei テンプレート](#nuclei-テンプレート)
-- [アセット探索](#アセット探索)
+- [CLI使用方法](#cli使用方法)
+- [59 Exploitモジュール](#59-exploitモジュール)
+- [DAG攻撃チェーンアーキテクチャ](#dag攻撃チェーンアーキテクチャ)
+- [Nucleiテンプレート](#nucleiテンプレート)
 - [プロジェクト構成](#プロジェクト構成)
 - [免責事項](#免責事項)
-- [作者](#作者)
-- [ライセンス](#ライセンス)
 
 ---
 
 ## 概要
 
-**CatchClaw** は、オープンソース AI コーディングエージェントプラットフォーム [OpenClaw](https://github.com/anthropics/open-claw) を専門に対象とした自動ペネトレーションテストツールです。アセット探索から RCE 検証までの完全な攻撃ライフサイクルをカバーし、31 のチェーン型エクスプロイトモジュールを使用して OpenClaw Gateway WebSocket API、HTTP エンドポイント、および統合インターフェースのセキュリティを包括的にテストします。
+**CatchClaw** は、[OpenClaw](https://github.com/anthropics/open-claw) / Open-WebUI AIコーディングエージェントプラットフォーム向けに構築されたRustベースの自動セキュリティ評価ツールです。59のExploitモジュールをDAG（有向非巡回グラフ）攻撃チェーンで編成し、偵察からデータ流出までの完全なATT&CKライフサイクルをカバーします。
 
-### なぜ CatchClaw なのか？
-
-| シナリオ | 手動テスト | CatchClaw |
-|----------|-----------|-------------|
-| **ターゲット発見** | Shodan/FOFA を手動検索 | `discover` ワンクリック集約 |
-| **インスタンス識別** | HTTP を一つずつ探索 | 無認証の自動フィンガープリント |
-| **認証テスト** | カスタムブルートフォーススクリプトを作成 | 組み込みワードリスト + スマート遅延 |
-| **脆弱性検証** | PoC を一つずつ手動作成 | 31 チェーン自動検証 |
-| **攻撃対象カバレッジ** | 経験依存 | WS + HTTP + OAuth + Webhook + ノード完全対応 |
-| **レポート出力** | 手動作成 | JSON + HTML ワンクリック生成 |
-| **CI/CD 統合** | なし | 23 Nuclei テンプレートをプラグアンドプレイ |
+Tokio非同期ランタイム上で動作し、DAGエンジンはKahnのトポロジカルソートによるレベル別並行実行、Semaphoreによる並行度制御、条件実行とフォールバックノードをサポートします。攻撃結果はMermaidフローチャートとして可視化可能です。
 
 ---
 
-## コア機能
+## 主要機能
 
 <table>
 <tr>
 <td width="50%">
 
-### 偵察と発見
+### 攻撃エンジン
 
-- **Shodan / FOFA アセット探索** — インターネット全体の OpenClaw インスタンス検索
-- **無認証フィンガープリント** — OpenClaw を自動検出してバージョン情報を抽出
-- **HTTP エンドポイント列挙** — 包括的な REST API ルートスキャン
-- **WebSocket メソッド発見** — 利用可能な Gateway WS メソッドを列挙
-- **認証モード検出** — 無認証 / トークン / OAuth モードを識別
-
-</td>
-<td width="50%">
-
-### 攻撃とエクスプロイト
-
-- **31 攻撃チェーン** — SSRF から完全 RCE チェーンまで
-- **自動エクスプロイトオーケストレーション** — チェーンオーケストレーターが順次実行
-- **自己承認 RCE** — exec.approval.request → 自己承認 → node.invoke
-- **キー窃取** — secrets.resolve / talk.config / API キー抽出
-- **永続的バックドア** — エージェント注入 + ファイル書き込み + Cron バイパス
-
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-### セキュリティ監査
-
-- **15 以上の設定監査項目** — 認証、権限、暗号化、ログ記録など
-- **トークンブルートフォース** — 組み込み高頻度弱パスワードワードリスト + カスタムワードリスト
-- **CORS 検出** — Origin リフレクション + 認証情報漏洩検証
-- **OAuth セキュリティ** — リダイレクトハイジャック + State 固定攻撃
+- **59 Exploitモジュール** — 10カテゴリ、`inventory`マクロ自動登録
+- **59 DAG攻撃チェーン** — 9つのATT&CKフェーズで自動編成
+- **Kahnトポロジカルソート** — 依存関係解決付きレベル別並行実行
+- **条件/フォールバック** — 前段の結果に基づく動的パス決定
+- **攻撃グラフ可視化** — ヒット/スキップ/フォールバック状態付きMermaid出力
 
 </td>
 <td width="50%">
 
-### ツールとレポート
+### プロトコルサポート
 
-- **インタラクティブシェル** — msfconsole スタイルの REPL、チェーンごとの実行
-- **23 Nuclei テンプレート** — CI/CD パイプラインへの直接統合
-- **JSON + HTML レポート** — 深刻度分類 + 修正アドバイス
-- **マルチターゲット並列処理** — `-c` フラグで並列数を制御
+- **WebSocket Gateway** — チャレンジハンドシェイク検出、JSON-RPCコール
+- **HTTP REST** — OAuth 302誤検知防止のためリダイレクト無効化
+- **誤検知排除** — チャレンジページ / SPAフォールバック / LLM拒否検出
+- **TLSサポート** — rustlsバックエンド、`--tls`でHTTPS/WSS有効化
+- **JSONレポート** — 構造化出力、重大度別分類
 
 </td>
 </tr>
@@ -147,160 +124,142 @@
 
 ---
 
-## クイックスタート
-
-### 要件
-
-- Go 1.22+
-- ネットワーク到達可能な OpenClaw インスタンス
-
-### ビルドとインストール
+## インストール
 
 ```bash
 git clone https://github.com/Coff0xc/catchclaw.git
-cd catchclaw
-go build -o catchclaw ./cmd/catchclaw/
+cd catchclaw/rust
+
+# Releaseビルド（最適化 + シンボル削除）
+cargo build --release
+
+# バイナリ: target/release/catchclaw
 ```
 
-### 基本的な使い方
+**要件:** Rust Edition 2024 (rustc 1.85+) | Windows / Linux / macOS
+
+---
+
+## クイックスタート
 
 ```bash
+# 登録モジュール一覧
+catchclaw list
+
 # フルスキャン
-./catchclaw scan -t 10.0.0.1:18789
+catchclaw scan -t ターゲットIP:ポート
+
+# JSONレポート付きスキャン
+catchclaw scan -t ターゲットIP:ポート -o report.json
 
 # トークン付きスキャン
-./catchclaw scan -t 10.0.0.1:18789 --token "your-gateway-token"
+catchclaw scan -t ターゲットIP:ポート --token "your-gateway-token"
 
-# エクスプロイトのみ
-./catchclaw exploit -t 10.0.0.1:18789 --token "tok"
+# 完全攻撃チェーン実行
+catchclaw exploit -t ターゲットIP:ポート --token xxx
 
-# インタラクティブシェル
-./catchclaw shell
+# 単一チェーンノード実行
+catchclaw exploit -t ターゲットIP:ポート --chain-id 30
 ```
 
 ---
 
-## 使い方
+## CLI使用方法
 
 ```
-使い方:
-  catchclaw [command]
+CatchClaw v5.0.0 — OpenClawセキュリティ評価ツール
 
-コマンド:
-  scan          フルパイプライン: フィンガープリント + 認証 + ブルートフォース + 偵察 + 監査 + エクスプロイト
-  fingerprint   OpenClaw インスタンスを検出
-  auth          認証テスト: 無認証検出 + トークンブルートフォース
-  recon         エンドポイント列挙 + WS メソッド発見 + バージョン検出
-  audit         設定監査 (トークン必須)
-  exploit       31 攻撃チェーンをすべて実行
-  discover      Shodan/FOFA アセット探索
-  shell         インタラクティブシェル (msfconsole スタイル)
+Usage: catchclaw <COMMAND>
 
-フラグ:
-  -t, --target string     ターゲット host:port
-  -T, --targets string    ターゲットリストファイル (1行1件)
-  -c, --concurrency int   並列スキャン数 (デフォルト 1)
-  -o, --output string     JSON レポート出力パス
-      --token string      Gateway Token
-      --tls               HTTPS/WSS を使用
-      --timeout int       HTTP タイムアウト秒数 (デフォルト 10)
-```
+Commands:
+  scan      フルセキュリティスキャン（DAG構築 → 実行 → 集計）
+  exploit   攻撃チェーン実行（完全DAGまたは単一ノード）
+  list      登録済み全Exploitモジュール一覧
 
----
+Scan Flags:
+  -t, --target <HOST:PORT>     ターゲットアドレス
+      --token <TOKEN>          Gatewayトークン (またはCATCHCLAWGUARD_TOKEN環境変数)
+      --timeout <SECS>         リクエストタイムアウト秒数 (デフォルト10)
+  -o, --output <FILE>          JSONレポート出力パス
+      --concurrency <N>        最大並行ワーカー数 (デフォルト10)
+      --tls                    HTTPS/WSS使用
+      --callback <URL>         SSRFコールバックURL
 
-## インタラクティブシェル
-
-```
-$ ./catchclaw shell
-
-CatchClaw interactive shell. Type 'help' for commands.
-lobster🦞> target 10.0.0.1:18789
-[*] Target set: 10.0.0.1:18789
-lobster🦞> token my-gateway-token
-[*] Token set: my-...ken
-lobster🦞> chain 30
-[*] Running chain 30: Full RCE chain (self-approve + node.invoke)
-lobster🦞> exploit
-[*] ═══ OpenClaw Attack Chain Orchestration ═══
-lobster🦞> chains
-Chain  0: Platform fingerprint (zero-auth)
-Chain  1: SSRF + cloud metadata
-...
-Chain 30: Full RCE chain (self-approve + node.invoke)
-lobster🦞> results
-lobster🦞> export report.json
+Exploit Flags:
+  -t, --target <HOST:PORT>     ターゲットアドレス
+      --token <TOKEN>          Gatewayトークン
+      --chain-id <ID>          特定チェーンノードIDを実行
+      --concurrency <N>        最大並行ワーカー数 (デフォルト10)
+      --tls                    HTTPS/WSS使用
 ```
 
 ---
 
-## 31 攻撃チェーン
+## 59 Exploitモジュール
 
-| # | チェーン | 深刻度 | 説明 |
-|---|---------|--------|------|
-| 0 | プラットフォームフィンガープリント | Info | 無認証 OpenClaw 検出 |
-| 1 | SSRF | Critical | browser.request/navigate → クラウドメタデータ (AWS/GCP/Azure/DO) |
-| 2 | eval() インジェクション | Critical | ツールパラメータ経由の eval/exec コード実行 |
-| 3 | API キー窃取 | Critical | config/env エンドポイント経由でプロバイダー API キーを抽出 |
-| 4 | ペアリングコードブルートフォース | High | DM ペアリングコード 6 桁ブルートフォース |
-| 5 | Cron バイパス | High | Cron ブラックリストバイパス + 永続化 |
-| 6 | プロンプトインジェクション | High | システムプロンプト抽出 + 命令上書き |
-| 7 | RCE 到達可能性 | Critical | system.run コマンド実行プローブ |
-| 8 | フックインジェクション | Critical | Webhook エンドポイント注入によるコマンド実行 |
-| 9 | シークレット抽出 | Critical | secrets.list + secrets.get 平文窃取 |
-| 10 | 設定改ざん | High | config.set によるセキュリティ設定への書き込み |
-| 11 | 直接ツール呼び出し | Critical | tools.invoke が Chat レイヤーのセキュリティをバイパス |
-| 12 | セッションハイジャック | High | sessions.preview IDOR + クロスセッションインジェクション |
-| 13 | CORS バイパス | Medium | Origin リフレクション → クロスオリジン WS/API アクセス |
-| 14 | チャンネルインジェクション | High | Mattermost/Slack/Discord 未署名コマンドインジェクション |
-| 15 | ログ漏洩 | Medium | logs.query による認証情報/機密データ露出 |
-| 16 | パッチエスケープ | Critical | apply_patch パストラバーサル → 任意ファイル書き込み |
-| 17 | WS ハイジャック | High | クロスオリジン WebSocket アップグレード + トークンリプレイ |
-| 18 | エージェントインジェクション | Critical | agents.create/update バックドア + システムプロンプト漏洩 |
-| 19 | OAuth 悪用 | High | Slack OAuth リダイレクトハイジャック + State 固定 |
-| 20 | Responses API | Critical | /v1/responses 認証バイパス + ツールインジェクション |
-| 21 | WS ファジング | Medium | 不正形式 JSON-RPC + メソッドインジェクション |
-| 22 | エージェントファイルインジェクション | Critical | agents.files.set 永続的プロンプトバックドア |
-| 23 | セッションファイル書き込み | Critical | sessions.patch + compact による任意ファイル書き込み |
-| 24 | 承認ハイジャック | Critical | プレフィックス ID マッチング + 実行ポリシー改ざん |
-| 25 | Talk シークレット | Critical | talk.config(includeSecrets) による API キー窃取 |
-| 26 | ブラウザ SSRF | High | browser.request 内部ディスパッチ |
-| 27 | Secrets Resolve | Critical | secrets.resolve 平文抽出 (内部インジェクション API) |
-| 28 | セッション記録窃取 | High | 未サニタイズのセッション履歴 + ツール出力窃取 |
-| 29 | 不正ノード | Critical | 自己承認ノードペアリング → コマンドインターセプト |
-| 30 | 完全 RCE | Critical | nodes.list → 自己承認 → node.invoke system.run |
+ATT&CKフェーズと攻撃カテゴリ別:
+
+| フェーズ | モジュール数 | 主要モジュール |
+|---------|------------|-------------|
+| **Recon** | 6 | cors_bypass, ws_hijack, auth_mode_abuse, log_disclosure, hidden_content, origin_wildcard |
+| **Initial Access** | 13 | ssrf, eval_inject, prompt_inject, mcp_inject, pairing_brute, oauth_abuse, responses_exploit, ws_fuzz, acp_bypass, ssrf_rebind, ssrf_proxy_bypass, browser_request, csrf_no_origin |
+| **Credential Access** | 5 | apikey_steal, oauth_token_theft, secret_extract, secrets_resolve, talk_secrets |
+| **Execution** | 7 | rce, hook_inject, tools_invoke, keychain_cmd_inject, qmd_cmd_inject, exec_race_toctou, exec_socket_leak |
+| **Persistence** | 8 | agent_inject, agent_file_inject, channel_inject, skill_poison, cron_bypass, session_file_write, patch_escape, link_template_inject |
+| **Privilege Escalation** | 5 | approval_hijack, config_tamper, rogue_node, silent_pair_abuse, auth_disable_leak |
+| **Lateral/Exfil** | 15 | session_hijack, transcript_theft, memory_data_leak, c2_exfil, browser_upload_traversal, secret_exec_abuse, bypass_soul, marker_spoof, redact_bypass, obfuscation_bypass, unicode_bypass, ratelimit_scope_bypass, flood_guard_reset, webhook_verify, skill_scanner_bypass |
 
 ---
 
-## Nuclei テンプレート
+## DAG攻撃チェーンアーキテクチャ
 
-すぐに使える 23 テンプレートを CI/CD に直接統合できます:
+```
+                        ┌─────────────────────┐
+                        │   Level 0 (Recon)    │
+                        │  CORS / WS / Auth    │
+                        └─────────┬───────────┘
+                                  │
+              ┌───────────────────┼───────────────────┐
+              ▼                   ▼                   ▼
+    ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+    │  Level 1 (Init) │ │ Level 1 (Cred)  │ │  Level 1 (Init) │
+    │ SSRF / Eval /   │ │ APIKey / OAuth  │ │ Prompt / MCP /  │
+    │ Pairing         │ │ Token Theft     │ │ Responses       │
+    └────────┬────────┘ └────────┬────────┘ └────────┬────────┘
+             │                   │                   │
+             └───────────────────┼───────────────────┘
+                                 ▼
+                   ┌─────────────────────────┐
+                   │   Level 2 (Execution)   │
+                   │  RCE / Hook / Tools     │
+                   └────────────┬────────────┘
+                                │
+                   ┌────────────┼────────────┐
+                   ▼                         ▼
+         ┌─────────────────┐       ┌─────────────────┐
+         │ Level 3 (Persis)│       │ Level 3 (Priv)  │
+         │ Agent / Cron    │       │ Approval / Node │
+         └────────┬────────┘       └────────┬────────┘
+                  └────────────┬────────────┘
+                               ▼
+                  ┌─────────────────────────┐
+                  │   Level 4 (Exfil)       │
+                  │  C2 / Transcript / Leak │
+                  └─────────────────────────┘
+```
+
+**実行特性:** Kahnトポロジカルソート → レベル別並行実行 | Semaphore並行度制御 | `depends_on` 依存関係 | `fallback_for` フォールバック | `condition` 条件実行 | `AttackGraph` Mermaid出力
+
+---
+
+## Nucleiテンプレート
+
+`nuclei-templates/` に45以上のNuclei互換YAMLテンプレートを同梱:
 
 ```bash
-# 単一ターゲットをスキャン
-nuclei -t nuclei-templates/ -u http://10.0.0.1:18789
-
-# ターゲットリストをスキャン
+nuclei -t nuclei-templates/ -u http://ターゲット:ポート
 nuclei -t nuclei-templates/ -l targets.txt
-
-# Critical のみ
-nuclei -t nuclei-templates/ -u http://target:18789 -severity critical
-```
-
-カバレッジ: インスタンス検出、無認証、デフォルトトークン、弱トークン、CORS、セッション露出、実行承認、Webhook、OAuth リダイレクト、WebSocket、Slack/Mattermost/Discord インジェクション、Responses API、エージェントファイル、不正ノード、シークレット解決、セッション窃取、完全 RCE など。
-
----
-
-## アセット探索
-
-```bash
-# Shodan
-./catchclaw discover --shodan-key "YOUR_KEY" -o targets.txt
-
-# FOFA
-./catchclaw discover --fofa-email "you@x.com" --fofa-key "KEY" -o targets.txt
-
-# 発見したすべてのターゲットをスキャン
-./catchclaw scan -T targets.txt -c 10
+nuclei -t nuclei-templates/ -u http://ターゲット:ポート -severity critical
 ```
 
 ---
@@ -309,33 +268,39 @@ nuclei -t nuclei-templates/ -u http://target:18789 -severity critical
 
 ```
 catchclaw/
-├── cmd/catchclaw/     # CLI エントリーポイント
-├── pkg/
-│   ├── audit/             # 設定監査
-│   ├── auth/              # 無認証検出 + トークンブルートフォース
-│   ├── chain/             # 攻撃チェーンオーケストレーター
-│   ├── discovery/         # Shodan/FOFA アセット探索
-│   ├── exploit/           # 30 エクスプロイトモジュール (4500+ 行)
-│   ├── interactive/       # msfconsole スタイルのインタラクティブシェル
-│   ├── recon/             # エンドポイント + WS メソッド列挙
-│   ├── report/            # JSON + HTML レポート生成
-│   ├── scanner/           # フィンガープリントエンジン
-│   └── utils/             # HTTP クライアント、WS クライアント、型定義
-├── nuclei-templates/      # 23 Nuclei YAML テンプレート
-└── rules/                 # デフォルト認証情報ワードリスト
+├── rust/
+│   ├── Cargo.toml                 # プロジェクト設定
+│   └── src/
+│       ├── main.rs                # CLIエントリポイント (clap derive)
+│       ├── config/mod.rs          # AppConfig + プロトコル定数
+│       ├── chain/
+│       │   ├── dag.rs             # DAGエンジン (トポソート + 並行 + AttackGraph)
+│       │   └── chains.rs          # 59攻撃チェーンノード定義
+│       ├── exploit/
+│       │   ├── registry.rs        # ExploitMeta + inventory登録システム
+│       │   ├── base.rs            # ExploitCtx共有コンテキスト
+│       │   └── *.rs               # 59 Exploitモジュール実装
+│       ├── scan/mod.rs            # フルスキャン編成
+│       ├── report/mod.rs          # JSONレポート出力
+│       └── utils/
+│           ├── types.rs           # Target / Finding / Severity / ScanResult
+│           ├── http.rs            # HTTPクライアント + 誤検知フィルタ
+│           └── ws.rs              # GatewayWsClient (WS + チャレンジ検出)
+├── nuclei-templates/              # 45以上のNuclei YAMLテンプレート
+├── scripts/gen_dag_chains.py      # DAGチェーン生成ヘルパー
+└── LICENSE                        # CatchClaw Strict Non-Commercial License v2.0
 ```
 
 ---
 
 ## 免責事項
 
-このツールは**認可されたセキュリティテストのみ**を目的としています。自分が所有するシステム、または明示的な書面による許可を得たシステムのみをテストしてください。コンピューターシステムへの不正アクセスは違法です。作者はいかなる悪用に対しても責任を負いません。
+本ツールは**許可されたセキュリティテスト**のみを目的としています。所有または明示的な書面による許可を得たシステムのみテストしてください。コンピュータシステムへの不正アクセスは違法です。作者はいかなる悪用に対しても責任を負いません。
 
-## 作者
+## 著者
 
-**coff0xc**
+**Coff0xc** — [https://github.com/Coff0xc](https://github.com/Coff0xc)
 
 ## ライセンス
 
-[GPL-3.0](LICENSE)
-
+[CatchClaw Strict Non-Commercial License v2.0](LICENSE) — 商用利用厳禁。

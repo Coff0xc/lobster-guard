@@ -1,8 +1,8 @@
-<h1 align="center">🦞 CatchClaw</h1>
+<h1 align="center">🦞 CatchClaw v5.0.0</h1>
 
 <p align="center">
-  <b>Outil d'évaluation de sécurité dédié à OpenClaw</b><br>
-  <sub>31 chaînes d'attaque | 23 templates Nuclei | Shell interactif | Découverte d'actifs Shodan/FOFA | Automatisation bout en bout</sub>
+  <b>Outil d'évaluation de sécurité automatisé pour les plateformes OpenClaw / Open-WebUI AI</b><br>
+  <sub>59 chaînes d'attaque DAG | 59 modules d'exploit | Mapping de phases ATT&CK | Moteur Async Tokio | Visualisation du graphe d'attaque</sub>
 </p>
 
 <p align="center">
@@ -11,7 +11,7 @@
   <a href="README_JA.md">日本語</a> ·
   <a href="README_RU.md">Русский</a> ·
   <a href="README_DE.md">Deutsch</a> ·
-  <b>Français</b>
+  <a href="README_FR.md"><b>Français</b></a>
 </p>
 
 <p align="center">
@@ -22,11 +22,11 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-1.0.0-blue?style=flat-square" alt="Version">
-  <img src="https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat-square&logo=go&logoColor=white" alt="Go">
-  <img src="https://img.shields.io/badge/Chains-31-FF6B6B?style=flat-square" alt="Chains">
-  <img src="https://img.shields.io/badge/Nuclei-23_Templates-4CAF50?style=flat-square" alt="Nuclei">
-  <img src="https://img.shields.io/badge/Exploits-30_Modules-orange?style=flat-square" alt="Exploits">
+  <img src="https://img.shields.io/badge/Version-5.0.0-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/Rust-Edition_2024-DEA584?style=flat-square&logo=rust&logoColor=white" alt="Rust">
+  <img src="https://img.shields.io/badge/DAG_Chains-59-FF6B6B?style=flat-square" alt="Chains">
+  <img src="https://img.shields.io/badge/Async-Tokio-4CAF50?style=flat-square" alt="Tokio">
+  <img src="https://img.shields.io/badge/Exploits-59_Modules-orange?style=flat-square" alt="Exploits">
   <img src="https://img.shields.io/badge/License-Non--Commercial--v2.0-green?style=flat-square" alt="License">
 </p>
 
@@ -34,110 +34,89 @@
 
 > **⚠️ UTILISATION COMMERCIALE STRICTEMENT INTERDITE**
 >
-> Licence: **CatchClaw Strict Non-Commercial License v2.0**.
+> Sous licence **CatchClaw Strict Non-Commercial License v2.0**.
 >
-> **Toute utilisation commerciale est strictement interdite sans autorisation ecrite du titulaire (Coff0xc).** Le titulaire se reserve le droit de poursuite retroactive sans limitation de temps. [LICENSE](LICENSE).
+> **TOUTE utilisation commerciale est STRICTEMENT INTERDITE sans autorisation écrite préalable du détenteur des droits d'auteur (Coff0xc).** Les contrevenants seront poursuivis.
+>
+> Les activités interdites incluent, sans s'y limiter :
+> - Vente, sous-licence ou location du Logiciel ou de ses œuvres dérivées
+> - Utilisation du Logiciel pour SaaS, services de pentest, conseil ou tout service payant
+> - Intégration dans des produits, plateformes ou outils commerciaux
+> - Entraînement de modèles AI/ML commerciaux
+> - Rebranding, reconditionnement ou distribution en marque blanche
+> - Toute activité générant directement ou indirectement des revenus
+>
+> **Le détenteur des droits d'auteur se réserve le droit d'application rétroactive SANS limitation de temps, y compris le recouvrement de tous les bénéfices, frais juridiques et dommages punitifs.**
+>
+> Voir [LICENSE](LICENSE).
 
-
+---
 
 ## Points forts
 
 ```
-┌──────────────────────────────────────────────────────────────────────────┐
-│                        CatchClaw v1.0.0                              │
-├──────────────────────────────────────────────────────────────────────────┤
-│  ● 31 chaînes d'attaque   ● 30 modules Exploit    ● 23 templates Nuclei │
-│  ● Shell interactif       ● Découverte Shodan/FOFA ● Rapports JSON+HTML  │
-│  ● Couverture WebSocket   ● Fingerprint sans auth  ● Scan multi-cibles   │
-├──────────────────────────────────────────────────────────────────────────┤
-│  Surface d'attaque: Gateway WS API | HTTP REST | OAuth | Webhook | Node Pairing   │
-│  Couverture: SSRF | RCE | Vol de clés | Détournement de session | Élévation de privilèges | Persistance | Fuite de données   │
-└──────────────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────────┐
+│                          CatchClaw v5.0.0                                │
+├────────────────────────────────────────────────────────────────────────────┤
+│  ● 59 chaînes DAG       ● 59 modules d'exploit  ● Moteur Async Tokio    │
+│  ● ATT&CK 9 phases      ● Graphe Mermaid        ● Rapports JSON         │
+│  ● Tri topologique Kahn  ● Semaphore concurrence ● Condition/Fallback    │
+├────────────────────────────────────────────────────────────────────────────┤
+│  Surface d'attaque: Gateway WS API | HTTP REST | OAuth | Webhook | Node  │
+│  Couverture: SSRF | RCE | Vol de clés | Détournement de session | Priv.  │
+│  Nouveau: Exfiltration C2 | Empoisonnement Skill | Injection Agent | MCP │
+└────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
 ## Table des matières
 
-- [Présentation](#présentation)
-- [Fonctionnalités principales](#fonctionnalités-principales)
+- [Aperçu](#aperçu)
+- [Fonctionnalités clés](#fonctionnalités-clés)
+- [Installation](#installation)
 - [Démarrage rapide](#démarrage-rapide)
-- [Utilisation](#utilisation)
-- [Shell interactif](#shell-interactif)
-- [31 chaînes d'attaque](#31-chaînes-dattaque)
+- [Utilisation CLI](#utilisation-cli)
+- [59 modules d'exploit](#59-modules-dexploit)
+- [Architecture des chaînes d'attaque DAG](#architecture-des-chaînes-dattaque-dag)
 - [Modèles Nuclei](#modèles-nuclei)
-- [Découverte d'actifs](#découverte-dactifs)
 - [Structure du projet](#structure-du-projet)
 - [Avertissement](#avertissement)
-- [Auteur](#auteur)
-- [Licence](#licence)
 
 ---
 
-## Présentation
+## Aperçu
 
-**CatchClaw** est un outil de test de pénétration automatisé spécialement conçu pour [OpenClaw](https://github.com/anthropics/open-claw) (plateforme open source d'agent de programmation IA). Il couvre le cycle de vie complet d'une attaque, de la découverte d'actifs à la validation RCE, et teste exhaustivement la sécurité de l'API WebSocket Gateway, des endpoints HTTP et des interfaces d'intégration d'OpenClaw via 31 modules Exploit enchaînés.
+**CatchClaw** est un outil d'évaluation de sécurité automatisé en Rust, conçu pour les plateformes [OpenClaw](https://github.com/anthropics/open-claw) / Open-WebUI. Il orchestre 59 modules d'exploit via un DAG (Graphe Acyclique Dirigé) de chaînes d'attaque, couvrant le cycle de vie complet ATT&CK de la reconnaissance à l'exfiltration de données.
 
-### Pourquoi CatchClaw ?
-
-| Scénario | Test manuel | CatchClaw |
-|----------|-------------|--------------|
-| **Découverte de cibles** | Recherche manuelle Shodan/FOFA | `discover` agrégation en un clic |
-| **Identification d'instances** | Sondage HTTP un par un | Fingerprint automatique sans authentification |
-| **Test d'authentification** | Scripts de brute-force maison | Dictionnaire intégré + délai intelligent |
-| **Validation de vulnérabilités** | Construction manuelle de PoC | 31 chaînes de validation automatisée |
-| **Couverture de surface d'attaque** | Dépend de l'expérience | WS + HTTP + OAuth + Webhook + Node couverture complète |
-| **Génération de rapport** | Compilation manuelle | JSON + HTML en un clic |
-| **Intégration CI/CD** | Aucune | 23 templates Nuclei plug-and-play |
+Construit sur le runtime asynchrone Tokio, le moteur DAG utilise le tri topologique de Kahn pour une exécution parallèle par niveaux avec une concurrence limitée par Semaphore, une exécution conditionnelle et des nœuds de repli. Les résultats d'attaque sont visualisés sous forme de diagrammes Mermaid.
 
 ---
 
-## Fonctionnalités principales
+## Fonctionnalités clés
 
 <table>
 <tr>
 <td width="50%">
 
-### Reconnaissance et découverte
+### Moteur d'attaque
 
-- **Découverte d'actifs Shodan / FOFA** — Recherche d'instances OpenClaw à l'échelle d'Internet
-- **Fingerprint sans authentification** — Détection automatique d'OpenClaw et extraction des informations de version
-- **Énumération des endpoints HTTP** — Scan complet des routes REST API
-- **Découverte des méthodes WebSocket** — Énumération des méthodes disponibles sur le Gateway WS
-- **Détection du mode d'authentification** — Identification des modes no-auth / token / OAuth
-
-</td>
-<td width="50%">
-
-### Attaque et exploitation
-
-- **31 chaînes d'attaque** — De SSRF à la chaîne RCE complète
-- **Orchestration d'exploitation automatisée** — Chain Orchestrator exécute en séquence
-- **RCE auto-approuvé** — exec.approval.request → auto-approbation → node.invoke
-- **Vol de clés** — secrets.resolve / talk.config / extraction de clés API
-- **Backdoor persistant** — Injection d'agent + écriture de fichiers + contournement Cron
-
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-### Audit de sécurité
-
-- **15+ points d'audit de configuration** — Authentification, permissions, chiffrement, journaux, etc.
-- **Brute-force de tokens** — Dictionnaire de mots de passe faibles haute fréquence + dictionnaire personnalisé
-- **Détection CORS** — Réflexion d'Origin + validation de fuite de credentials
-- **Sécurité OAuth** — Détournement de redirection + attaque de fixation de State
+- **59 modules d'exploit** — 10 catégories, auto-enregistrement par macro `inventory`
+- **59 chaînes DAG** — 9 phases ATT&CK, orchestration automatisée
+- **Tri topologique de Kahn** — Exécution parallèle par niveaux avec résolution des dépendances
+- **Nœuds conditionnels/repli** — Décisions de chemin dynamiques basées sur les résultats précédents
+- **Visualisation du graphe** — Export Mermaid avec statuts touché/ignoré/repli
 
 </td>
 <td width="50%">
 
-### Outils et rapports
+### Support des protocoles
 
-- **Shell interactif** — REPL style msfconsole, exécution chaîne par chaîne
-- **23 templates Nuclei** — Intégration directe dans les pipelines CI/CD
-- **Rapports JSON + HTML** — Classification par niveau de criticité + recommandations de remédiation
-- **Multi-cibles concurrent** — Paramètre `-c` pour contrôler la concurrence
+- **WebSocket Gateway** — Détection du handshake challenge, appels JSON-RPC
+- **HTTP REST** — Redirections désactivées pour éviter les faux positifs OAuth 302
+- **Élimination des faux positifs** — Pages challenge / fallback SPA / refus LLM
+- **Support TLS** — Backend rustls, `--tls` active HTTPS/WSS
+- **Rapports JSON** — Sortie structurée, classifiée par sévérité
 
 </td>
 </tr>
@@ -145,160 +124,142 @@
 
 ---
 
-## Démarrage rapide
-
-### Prérequis
-
-- Go 1.22+
-- Instance OpenClaw accessible sur le réseau
-
-### Compilation et installation
+## Installation
 
 ```bash
 git clone https://github.com/Coff0xc/catchclaw.git
-cd catchclaw
-go build -o catchclaw ./cmd/catchclaw/
+cd catchclaw/rust
+
+# Build Release (optimisé + symboles supprimés)
+cargo build --release
+
+# Binaire: target/release/catchclaw
 ```
 
-### Utilisation de base
+**Prérequis :** Rust Edition 2024 (rustc 1.85+) | Windows / Linux / macOS
+
+---
+
+## Démarrage rapide
 
 ```bash
+# Lister les modules enregistrés
+catchclaw list
+
 # Scan complet
-./catchclaw scan -t 10.0.0.1:18789
+catchclaw scan -t CIBLE_IP:PORT
 
-# Scan avec Token
-./catchclaw scan -t 10.0.0.1:18789 --token "your-gateway-token"
+# Scan avec rapport JSON
+catchclaw scan -t CIBLE_IP:PORT -o report.json
 
-# Exploit uniquement
-./catchclaw exploit -t 10.0.0.1:18789 --token "tok"
+# Scan avec jeton d'authentification
+catchclaw scan -t CIBLE_IP:PORT --token "your-gateway-token"
 
-# Shell interactif
-./catchclaw shell
+# Exécuter la chaîne d'attaque complète
+catchclaw exploit -t CIBLE_IP:PORT --token xxx
+
+# Exécuter un seul nœud de chaîne
+catchclaw exploit -t CIBLE_IP:PORT --chain-id 30
 ```
 
 ---
 
-## Utilisation
+## Utilisation CLI
 
 ```
-Usage:
-  catchclaw [command]
+CatchClaw v5.0.0 — Outil d'évaluation de sécurité OpenClaw
+
+Usage: catchclaw <COMMAND>
 
 Commands:
-  scan          Pipeline complet: fingerprint + auth + brute-force + recon + audit + exploit
-  fingerprint   Détection d'instance OpenClaw
-  auth          Test d'authentification: détection sans auth + brute-force de token
-  recon         Énumération des endpoints + découverte des méthodes WS + détection de version
-  audit         Audit de configuration (nécessite un Token)
-  exploit       Exécution complète des 31 chaînes d'attaque
-  discover      Découverte d'actifs Shodan/FOFA
-  shell         Shell interactif (style msfconsole)
+  scan      Scan de sécurité complet (construction DAG → exécution → résumé)
+  exploit   Exécuter les chaînes d'attaque (DAG complet ou nœud unique)
+  list      Lister tous les modules d'exploit enregistrés
 
-Flags:
-  -t, --target string     Cible host:port
-  -T, --targets string    Fichier de liste de cibles (une par ligne)
-  -c, --concurrency int   Nombre de scans concurrents (défaut 1)
-  -o, --output string     Chemin de sortie du rapport JSON
-      --token string      Gateway Token
-      --tls               Utiliser HTTPS/WSS
-      --timeout int       Délai d'expiration HTTP en secondes (défaut 10)
+Scan Flags:
+  -t, --target <HOST:PORT>     Adresse cible
+      --token <TOKEN>          Jeton Gateway (ou variable CATCHCLAWGUARD_TOKEN)
+      --timeout <SECS>         Délai de requête en secondes (défaut 10)
+  -o, --output <FILE>          Chemin de sortie du rapport JSON
+      --concurrency <N>        Workers parallèles max (défaut 10)
+      --tls                    Utiliser HTTPS/WSS
+      --callback <URL>         URL de callback SSRF
+
+Exploit Flags:
+  -t, --target <HOST:PORT>     Adresse cible
+      --token <TOKEN>          Jeton Gateway
+      --chain-id <ID>          Exécuter un nœud de chaîne unique par ID
+      --concurrency <N>        Workers parallèles max (défaut 10)
+      --tls                    Utiliser HTTPS/WSS
 ```
 
 ---
 
-## Shell interactif
+## 59 modules d'exploit
 
-```
-$ ./catchclaw shell
+Par phase ATT&CK et catégorie d'attaque :
 
-CatchClaw interactive shell. Type 'help' for commands.
-lobster🦞> target 10.0.0.1:18789
-[*] Target set: 10.0.0.1:18789
-lobster🦞> token my-gateway-token
-[*] Token set: my-...ken
-lobster🦞> chain 30
-[*] Running chain 30: Full RCE chain (self-approve + node.invoke)
-lobster🦞> exploit
-[*] ═══ OpenClaw Attack Chain Orchestration ═══
-lobster🦞> chains
-Chain  0: Platform fingerprint (zero-auth)
-Chain  1: SSRF + cloud metadata
-...
-Chain 30: Full RCE chain (self-approve + node.invoke)
-lobster🦞> results
-lobster🦞> export report.json
-```
+| Phase | Nombre | Modules clés |
+|-------|--------|-------------|
+| **Recon** | 6 | cors_bypass, ws_hijack, auth_mode_abuse, log_disclosure, hidden_content, origin_wildcard |
+| **Initial Access** | 13 | ssrf, eval_inject, prompt_inject, mcp_inject, pairing_brute, oauth_abuse, responses_exploit, ws_fuzz, acp_bypass, ssrf_rebind, ssrf_proxy_bypass, browser_request, csrf_no_origin |
+| **Credential Access** | 5 | apikey_steal, oauth_token_theft, secret_extract, secrets_resolve, talk_secrets |
+| **Execution** | 7 | rce, hook_inject, tools_invoke, keychain_cmd_inject, qmd_cmd_inject, exec_race_toctou, exec_socket_leak |
+| **Persistence** | 8 | agent_inject, agent_file_inject, channel_inject, skill_poison, cron_bypass, session_file_write, patch_escape, link_template_inject |
+| **Privilege Escalation** | 5 | approval_hijack, config_tamper, rogue_node, silent_pair_abuse, auth_disable_leak |
+| **Lateral/Exfil** | 15 | session_hijack, transcript_theft, memory_data_leak, c2_exfil, browser_upload_traversal, secret_exec_abuse, bypass_soul, marker_spoof, redact_bypass, obfuscation_bypass, unicode_bypass, ratelimit_scope_bypass, flood_guard_reset, webhook_verify, skill_scanner_bypass |
 
 ---
 
-## 31 chaînes d'attaque
+## Architecture des chaînes d'attaque DAG
 
-| # | Chaîne d'attaque | Criticité | Description |
-|---|------------------|-----------|-------------|
-| 0 | Fingerprint de plateforme | Info | Détection OpenClaw sans authentification |
-| 1 | SSRF | Critical | browser.request/navigate → métadonnées cloud (AWS/GCP/Azure/DO) |
-| 2 | Injection eval() | Critical | Exécution de code eval/exec dans les paramètres d'outils |
-| 3 | Vol de clé API | Critical | Extraction de clés API Provider via les endpoints config/env |
-| 4 | Brute-force du code de jumelage | High | Brute-force du code de jumelage DM à 6 chiffres |
-| 5 | Contournement Cron | High | Contournement de la liste noire Cron + persistance |
-| 6 | Injection de prompt | High | Extraction du prompt système + remplacement d'instructions |
-| 7 | Accessibilité RCE | Critical | Sondage d'exécution de commandes system.run |
-| 8 | Injection de Hook | Critical | Injection de commandes via endpoint Webhook |
-| 9 | Extraction de secrets | Critical | secrets.list + secrets.get vol en clair |
-| 10 | Falsification de configuration | High | config.set écriture de configuration de sécurité |
-| 11 | Invocation directe d'outils | Critical | tools.invoke contournement de la sécurité de la couche Chat |
-| 12 | Détournement de session | High | sessions.preview IDOR + injection inter-sessions |
-| 13 | Contournement CORS | Medium | Réflexion d'Origin → accès WS/API cross-origin |
-| 14 | Injection de canal | High | Injection de commandes non signées Mattermost/Slack/Discord |
-| 15 | Fuite de journaux | Medium | logs.query fuite de credentials/données sensibles |
-| 16 | Évasion de Patch | Critical | apply_patch traversée de chemin → écriture de fichier arbitraire |
-| 17 | Détournement WS | High | Upgrade WebSocket cross-origin + rejeu de Token |
-| 18 | Injection d'agent | Critical | agents.create/update backdoor + fuite du prompt système |
-| 19 | Abus OAuth | High | Détournement de redirection Slack OAuth + fixation de State |
-| 20 | Responses API | Critical | /v1/responses contournement d'auth + injection d'outils |
-| 21 | WS Fuzz | Medium | JSON-RPC malformé + injection de méthodes |
-| 22 | Injection de fichiers d'agent | Critical | agents.files.set backdoor de prompt persistant |
-| 23 | Écriture de fichiers de session | Critical | sessions.patch + compact écriture de fichier arbitraire |
-| 24 | Détournement d'approbation | Critical | Correspondance de préfixe d'ID + falsification de politique d'exécution |
-| 25 | Clés Talk | Critical | talk.config(includeSecrets) fuite de clés API |
-| 26 | SSRF navigateur | High | browser.request dispatch interne |
-| 27 | Secrets Resolve | Critical | secrets.resolve extraction en clair (API d'injection interne) |
-| 28 | Vol d'historique de session | High | Historique de session non anonymisé + vol de sortie d'outils |
-| 29 | Nœud malveillant | Critical | Jumelage de nœud auto-approuvé → interception de commandes |
-| 30 | RCE complet | Critical | nodes.list → auto-approbation → node.invoke system.run |
+```
+                        ┌─────────────────────┐
+                        │  Level 0 (Recon)     │
+                        │  CORS / WS / Auth    │
+                        └─────────┬───────────┘
+                                  │
+              ┌───────────────────┼───────────────────┐
+              ▼                   ▼                   ▼
+    ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+    │ Level 1 (Accès) │ │ Level 1 (Cred.) │ │ Level 1 (Accès) │
+    │ SSRF / Eval /   │ │ APIKey / OAuth  │ │ Prompt / MCP /  │
+    │ Pairing         │ │ Token Theft     │ │ Responses       │
+    └────────┬────────┘ └────────┬────────┘ └────────┬────────┘
+             │                   │                   │
+             └───────────────────┼───────────────────┘
+                                 ▼
+                   ┌─────────────────────────┐
+                   │  Level 2 (Exécution)    │
+                   │  RCE / Hook / Tools     │
+                   └────────────┬────────────┘
+                                │
+                   ┌────────────┼────────────┐
+                   ▼                         ▼
+         ┌─────────────────┐       ┌─────────────────┐
+         │ Level 3 (Persis)│       │ Level 3 (Escal.)│
+         │ Agent / Cron    │       │ Approval / Node │
+         └────────┬────────┘       └────────┬────────┘
+                  └────────────┬────────────┘
+                               ▼
+                  ┌─────────────────────────┐
+                  │  Level 4 (Exfiltr.)     │
+                  │  C2 / Transcript / Leak │
+                  └─────────────────────────┘
+```
+
+**Caractéristiques d'exécution :** Tri topologique de Kahn → parallélisme par niveaux | Concurrence Semaphore | `depends_on` dépendances | `fallback_for` repli | `condition` exécution conditionnelle | `AttackGraph` export Mermaid
 
 ---
 
 ## Modèles Nuclei
 
-23 modèles prêts à l'emploi, intégrables directement dans CI/CD :
+`nuclei-templates/` contient 45+ modèles YAML compatibles Nuclei :
 
 ```bash
-# Scanner une cible unique
-nuclei -t nuclei-templates/ -u http://10.0.0.1:18789
-
-# Scanner une liste de cibles
+nuclei -t nuclei-templates/ -u http://CIBLE:PORT
 nuclei -t nuclei-templates/ -l targets.txt
-
-# Critical uniquement
-nuclei -t nuclei-templates/ -u http://target:18789 -severity critical
-```
-
-Couverture : détection d'instance, sans authentification, token par défaut, token faible, CORS, exposition de session, approbation d'exécution, Webhook, redirection OAuth, WebSocket, injection Slack/Mattermost/Discord, Responses API, fichiers d'agent, nœud malveillant, résolution de secrets, vol de session, RCE complet, etc.
-
----
-
-## Découverte d'actifs
-
-```bash
-# Shodan
-./catchclaw discover --shodan-key "YOUR_KEY" -o targets.txt
-
-# FOFA
-./catchclaw discover --fofa-email "you@x.com" --fofa-key "KEY" -o targets.txt
-
-# Scanner toutes les cibles découvertes
-./catchclaw scan -T targets.txt -c 10
+nuclei -t nuclei-templates/ -u http://CIBLE:PORT -severity critical
 ```
 
 ---
@@ -307,32 +268,39 @@ Couverture : détection d'instance, sans authentification, token par défaut, to
 
 ```
 catchclaw/
-├── cmd/catchclaw/     # Point d'entrée CLI
-├── pkg/
-│   ├── audit/             # Audit de configuration
-│   ├── auth/              # Détection sans auth + brute-force de token
-│   ├── chain/             # Orchestrateur de chaînes d'attaque
-│   ├── discovery/         # Découverte d'actifs Shodan/FOFA
-│   ├── exploit/           # 30 modules Exploit (4500+ lignes)
-│   ├── interactive/       # Shell interactif style msfconsole
-│   ├── recon/             # Énumération des endpoints + méthodes WS
-│   ├── report/            # Génération de rapports JSON + HTML
-│   ├── scanner/           # Moteur de fingerprint
-│   └── utils/             # Client HTTP, client WS, définitions de types
-├── nuclei-templates/      # 23 templates Nuclei YAML
-└── rules/                 # Dictionnaires de credentials par défaut
+├── rust/
+│   ├── Cargo.toml                 # Configuration du projet
+│   └── src/
+│       ├── main.rs                # Point d'entrée CLI (clap derive)
+│       ├── config/mod.rs          # AppConfig + constantes de protocole
+│       ├── chain/
+│       │   ├── dag.rs             # Moteur DAG (tri topo + concurrence + AttackGraph)
+│       │   └── chains.rs          # 59 définitions de nœuds de chaînes d'attaque
+│       ├── exploit/
+│       │   ├── registry.rs        # ExploitMeta + système d'enregistrement inventory
+│       │   ├── base.rs            # ExploitCtx contexte partagé
+│       │   └── *.rs               # 59 implémentations de modules d'exploit
+│       ├── scan/mod.rs            # Orchestration du scan complet
+│       ├── report/mod.rs          # Sortie de rapport JSON
+│       └── utils/
+│           ├── types.rs           # Target / Finding / Severity / ScanResult
+│           ├── http.rs            # Client HTTP + filtres de faux positifs
+│           └── ws.rs              # GatewayWsClient (WS + détection challenge)
+├── nuclei-templates/              # 45+ modèles YAML Nuclei
+├── scripts/gen_dag_chains.py      # Aide à la génération de chaînes DAG
+└── LICENSE                        # CatchClaw Strict Non-Commercial License v2.0
 ```
 
 ---
 
 ## Avertissement
 
-Cet outil est destiné uniquement aux **tests de sécurité autorisés**. Ne testez que les systèmes que vous possédez ou pour lesquels vous avez obtenu une autorisation écrite explicite. L'accès non autorisé à des systèmes informatiques est illégal. L'auteur décline toute responsabilité en cas d'utilisation abusive.
+Cet outil est destiné **exclusivement aux tests de sécurité autorisés**. Ne testez que les systèmes que vous possédez ou pour lesquels vous disposez d'une autorisation écrite explicite. L'accès non autorisé aux systèmes informatiques est illégal. L'auteur décline toute responsabilité en cas d'utilisation abusive.
 
 ## Auteur
 
-**coff0xc**
+**Coff0xc** — [https://github.com/Coff0xc](https://github.com/Coff0xc)
 
 ## Licence
 
-[GPL-3.0](LICENSE)
+[CatchClaw Strict Non-Commercial License v2.0](LICENSE) — Utilisation commerciale strictement interdite.

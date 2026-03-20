@@ -1,8 +1,8 @@
-<h1 align="center">🦞 CatchClaw‌ v5.0.0</h1>
+<h1 align="center">🦞 CatchClaw v5.0.0</h1>
 
 <p align="center">
   <b>OpenClaw / Open-WebUI AI 编程平台 — 自动化安全评估工具</b><br>
-  <sub>59 条 DAG 攻击链 | 59 个 Exploit 模块 | Async Tokio 运行时 | WS Gateway | HTTP 探测 | JSON 报告</sub>
+  <sub>59 条 DAG 攻击链 | 59 个 Exploit 模块 | ATT&CK 阶段映射 | Async Tokio 引擎 | 攻击图可视化</sub>
 </p>
 
 <p align="center">
@@ -23,7 +23,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Version-5.0.0-blue?style=flat-square" alt="Version">
-  <img src="https://img.shields.io/badge/Rust-1.75+-DEA584?style=flat-square&logo=rust&logoColor=white" alt="Rust">
+  <img src="https://img.shields.io/badge/Rust-Edition_2024-DEA584?style=flat-square&logo=rust&logoColor=white" alt="Rust">
   <img src="https://img.shields.io/badge/DAG_Chains-59-FF6B6B?style=flat-square" alt="Chains">
   <img src="https://img.shields.io/badge/Async-Tokio-4CAF50?style=flat-square" alt="Tokio">
   <img src="https://img.shields.io/badge/Exploits-59_Modules-orange?style=flat-square" alt="Exploits">
@@ -50,21 +50,22 @@
 >
 > 详见 [LICENSE](LICENSE)。
 
+---
 
 ## 项目亮点
 
 ```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                         CatchClaw v5.0.0                                  │
-├──────────────────────────────────────────────────────────────────────────────┤
+┌────────────────────────────────────────────────────────────────────────────┐
+│                          CatchClaw v5.0.0                                │
+├────────────────────────────────────────────────────────────────────────────┤
 │  ● 59 条 DAG 攻击链     ● 59 个 Exploit 模块    ● Async Tokio 引擎       │
-│  ● WS Gateway 客户端   ● HTTP 探测引擎        ● JSON 报告生成           │
-│  ● 单二进制 4.3MB      ● 零依赖部署          ● ATT&CK 阶段映射         │
-├──────────────────────────────────────────────────────────────────────────────┤
-│  攻击面: Gateway WS API | HTTP REST | OAuth | Webhook | Node Pairing       │
-│  覆盖: SSRF | RCE | 密钥窃取 | 会话劫持 | 提权 | 持久化 | 数据泄露       │
-│  新增: C2 外泄 | Skill 投毒 | Agent 注入 | OAuth 窃取                  │
-└──────────────────────────────────────────────────────────────────────────────┘
+│  ● ATT&CK 9阶段映射    ● Mermaid 攻击图导出    ● JSON 报告生成           │
+│  ● Kahn 拓扑排序引擎    ● Semaphore 并发控制    ● 条件/回退执行           │
+├────────────────────────────────────────────────────────────────────────────┤
+│  攻击面: Gateway WS API | HTTP REST | OAuth | Webhook | Node Pairing     │
+│  覆盖: SSRF | RCE | 密钥窃取 | 会话劫持 | 提权 | 持久化 | 数据泄露      │
+│  新增: C2外泄 | Skill投毒 | Agent注入 | MCP注入 | OAuth窃取 | DNS Rebind  │
+└────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -75,36 +76,76 @@
 - [核心特性](#核心特性)
 - [安装方式](#安装方式)
 - [快速开始](#快速开始)
-- [模块列表](#模块列表)
+- [CLI 用法](#cli-用法)
+- [59 个 Exploit 模块](#59-个-exploit-模块)
+- [DAG 攻击链架构](#dag-攻击链架构)
+- [Nuclei 模板](#nuclei-模板)
 - [项目结构](#项目结构)
+- [免责声明](#免责声明)
+
+---
 
 ## 项目简介
 
-CatchClaw 是一款基于 Rust 的 OpenClaw / Open-WebUI AI 编程平台安全评估工具。通过 59 条 DAG 攻击链和 59 个 Exploit 模块，覆盖从初始访问到数据泄露的完整 ATT&CK 攻击链路。
+**CatchClaw** 是一款基于 Rust 的 [OpenClaw](https://github.com/anthropics/open-claw) / Open-WebUI AI 编程平台安全评估工具。通过 59 条 DAG 攻击链和 59 个 Exploit 模块，覆盖从初始侦察到数据泄露的完整 ATT&CK 攻击链路。
 
-基于 Tokio 异步运行时，单二进制 4.3MB，零依赖部署。
+基于 Tokio 异步运行时，DAG 引擎使用 Kahn 拓扑排序按层级并发执行，Semaphore 控制并发度，支持条件执行与回退节点。攻击图可导出 Mermaid 流程图。
+
+### 为什么选择 CatchClaw？
+
+| 场景 | 手工测试 | CatchClaw |
+|------|---------|-----------|
+| **漏洞验证** | 逐个手写 PoC | 59 条链自动编排验证 |
+| **攻击面覆盖** | 靠经验判断 | WS + HTTP + OAuth + Webhook + Node 全覆盖 |
+| **依赖链发现** | 难以追踪 | DAG 自动发现漏洞依赖路径 |
+| **结果可视化** | 手工整理 | Mermaid 攻击图 + JSON 报告 |
+| **CI/CD 集成** | 无 | 45+ Nuclei 模板即插即用 |
+
+---
 
 ## 核心特性
 
-- **59 个 Exploit 模块** — 覆盖 SSRF、RCE、密钥窃取、会话劫持、提权、持久化、数据泄露
-- **59 条 DAG 攻击链** — 5 个 ATT&CK 阶段自动编排（初始访问 → 凭证获取 → 执行 → 持久化 → 泄露）
-- **Async Tokio 引擎** — 高并发异步扫描，原子计数器避免竞态
-- **WS Gateway 客户端** — WebSocket 协议完整支持
-- **HTTP 探测引擎** — REST API 端点自动探测
-- **安全 UTF-8 处理** — truncate_str 防止运行时 panic
-- **单二进制 4.3MB** — 零依赖，解压即用
-- **JSON 报告** — 结构化扫描结果输出
+<table>
+<tr>
+<td width="50%">
+
+### 攻击引擎
+
+- **59 个 Exploit 模块** — 覆盖 10 大类别，`inventory` 宏自动注册
+- **59 条 DAG 攻击链** — 9 个 ATT&CK 阶段自动编排
+- **Kahn 拓扑排序** — 层级并发执行，自动解析依赖
+- **条件/回退节点** — 按前序结果动态决策执行路径
+- **攻击图可视化** — Mermaid 导出，标记命中/跳过/回退状态
+
+</td>
+<td width="50%">
+
+### 协议支持
+
+- **WebSocket Gateway** — challenge 握手检测，JSON-RPC 调用
+- **HTTP REST** — 禁用重定向防止 OAuth 302 误报
+- **误报消除** — challenge 页面 / SPA 回退 / LLM 拒绝检测
+- **TLS 支持** — rustls 后端，`--tls` 启用 HTTPS/WSS
+- **JSON 报告** — 结构化输出，按严重级别分类
+
+</td>
+</tr>
+</table>
+
+---
 
 ## 安装方式
 
 ### 从源码构建
 
 ```bash
-# 克隆仓库
 git clone https://github.com/Coff0xc/catchclaw.git
 cd catchclaw/rust
 
-# 构建 Release 版本
+# Debug 构建
+cargo build
+
+# Release 构建（优化 + 剥离符号表）
 cargo build --release
 
 # 二进制位于 target/release/catchclaw
@@ -112,62 +153,259 @@ cargo build --release
 
 ### 系统要求
 
-- Rust 1.75+
+- Rust Edition 2024 (rustc 1.85+)
 - 支持 Windows / Linux / macOS
+
+---
 
 ## 快速开始
 
 ```bash
-# 查看所有模块
+# 查看所有注册模块
 catchclaw list
 
 # 全量扫描
 catchclaw scan -t 目标IP:端口
 
-# 扫描并输出报告
+# 扫描并输出 JSON 报告
 catchclaw scan -t 目标IP:端口 -o report.json
 
-# 执行特定攻击链
+# 带 Token 扫描
+catchclaw scan -t 目标IP:端口 --token "your-gateway-token"
+
+# 执行完整攻击链
 catchclaw exploit -t 目标IP:端口 --token xxx
+
+# 执行单条攻击链
+catchclaw exploit -t 目标IP:端口 --chain-id 30
 ```
 
-## 模块列表
+---
 
-59 个 Exploit 模块覆盖 6 大攻击类别：
+## CLI 用法
 
-| 类别 | 模块数 | 示例 |
-|------|--------|------|
-| Injection | 16 | MCP 注入、Prompt 注入、Agent 注入、Hook 注入、Eval 注入 |
-| RCE | 9 | 完整 RCE、命令注入、文件写入、竞态条件、浏览器上传穿越 |
-| SSRF | 5 | SSRF、DNS Rebind、代理绕过、浏览器请求 |
-| Auth | 9 | OAuth 滥用、配对爆破、静默配对、审批劫持、ACP 绕过 |
-| Credential | 5 | API Key 窃取、OAuth Token 窃取、密钥提取、会话劫持 |
-| DataLeak | 7 | 记录窃取、日志泄露、内存数据泄露、C2 外泄 |
-| Config/Transport | 8 | CORS 绕过、CSRF、WS 劫持、WS Fuzz、Webhook 验证 |
+```
+CatchClaw v5.0.0 — OpenClaw 安全评估工具
+
+Usage: catchclaw <COMMAND>
+
+Commands:
+  scan      全量安全扫描（构建 DAG → 执行 → 汇总）
+  exploit   执行攻击链（完整 DAG 或单节点）
+  list      列出所有注册的 Exploit 模块
+
+Scan Flags:
+  -t, --target <HOST:PORT>     目标地址
+      --token <TOKEN>          Gateway Token (或 CATCHCLAWGUARD_TOKEN 环境变量)
+      --timeout <SECS>         请求超时秒数 (默认 10)
+  -o, --output <FILE>          JSON 报告输出路径
+      --concurrency <N>        最大并发数 (默认 10)
+      --tls                    使用 HTTPS/WSS
+      --callback <URL>         SSRF 回调地址
+
+Exploit Flags:
+  -t, --target <HOST:PORT>     目标地址
+      --token <TOKEN>          Gateway Token
+      --chain-id <ID>          指定运行单条链节点 ID
+      --concurrency <N>        最大并发数 (默认 10)
+      --tls                    使用 HTTPS/WSS
+```
+
+---
+
+## 59 个 Exploit 模块
+
+按 ATT&CK 阶段和攻击类别分组：
+
+### Recon（侦察）
+
+| 模块 | 类别 | 说明 |
+|------|------|------|
+| cors_bypass | Config | Origin 反射 → 跨域 WS/API 访问 |
+| ws_hijack | Transport | 跨域 WebSocket 升级 + Token 重放 |
+| auth_mode_abuse | Auth | 认证模式检测与滥用 |
+| log_disclosure | DataLeak | logs.query 凭证/敏感数据泄露 |
+| hidden_content | DataLeak | 隐藏内容发现 |
+| origin_wildcard | Config | Origin 通配符配置检测 |
+
+### Initial Access（初始访问）
+
+| 模块 | 类别 | 说明 |
+|------|------|------|
+| ssrf | SSRF | browser.request/navigate → 云元数据 (AWS/GCP/Azure) |
+| eval_inject | Injection | eval/exec 代码执行 |
+| prompt_inject | Injection | 系统提示词提取 + 指令覆盖 |
+| mcp_inject | Injection | MCP 插件注入 |
+| pairing_brute | Auth | DM 配对码 6 位爆破 |
+| oauth_abuse | Auth | Slack OAuth 重定向劫持 |
+| responses_exploit | API | /v1/responses 认证绕过 + 工具注入 |
+| ws_fuzz | Fuzz | 畸形 JSON-RPC + 方法注入 |
+| acp_bypass | Auth | ACP 访问控制绕过 |
+| ssrf_rebind | SSRF | DNS Rebind SSRF |
+| ssrf_proxy_bypass | SSRF | 代理绕过 SSRF |
+| browser_request | SSRF | 浏览器请求内部分发 |
+| csrf_no_origin | Config | 无 Origin 验证 CSRF |
+
+### Credential Access（凭证获取）
+
+| 模块 | 类别 | 说明 |
+|------|------|------|
+| apikey_steal | Credential | Provider API Key 提取 |
+| oauth_token_theft | Credential | OAuth Token 窃取 |
+| secret_extract | Credential | secrets.list + secrets.get 明文窃取 |
+| secrets_resolve | Credential | secrets.resolve 内部注入 API |
+| talk_secrets | Credential | talk.config(includeSecrets) 密钥泄露 |
+
+### Execution（执行）
+
+| 模块 | 类别 | 说明 |
+|------|------|------|
+| rce | RCE | system.run 命令执行探测 |
+| hook_inject | RCE | Webhook 端点注入执行命令 |
+| tools_invoke | RCE | tools.invoke 绕过 Chat 层安全 |
+| keychain_cmd_inject | RCE | Keychain 命令注入 |
+| qmd_cmd_inject | RCE | QMD 命令注入 |
+| exec_race_toctou | RCE | 执行竞态条件 (TOCTOU) |
+| exec_socket_leak | RCE | 执行 Socket 泄露 |
+
+### Persistence（持久化）
+
+| 模块 | 类别 | 说明 |
+|------|------|------|
+| agent_inject | Injection | agents.create/update 后门 + 系统提示词泄露 |
+| agent_file_inject | Injection | agents.files.set 持久化提示词后门 |
+| channel_inject | Injection | Mattermost/Slack/Discord 无签名命令注入 |
+| skill_poison | Injection | Skill 投毒 |
+| cron_bypass | Persistence | Cron 黑名单绕过 + 持久化 |
+| session_file_write | RCE | sessions.patch 任意文件写入 |
+| patch_escape | RCE | apply_patch 路径穿越 → 任意文件写入 |
+| link_template_inject | Injection | 链接模板注入 |
+
+### Privilege Escalation（提权）
+
+| 模块 | 类别 | 说明 |
+|------|------|------|
+| approval_hijack | Auth | 前缀 ID 匹配 + 执行策略篡改 |
+| config_tamper | Config | config.set 安全配置写入 |
+| rogue_node | RCE | 自批准节点配对 → 命令拦截 |
+| silent_pair_abuse | Auth | 静默配对滥用 |
+| auth_disable_leak | Auth | 认证禁用泄露 |
+
+### Lateral Movement / Exfiltration（横移 / 泄露）
+
+| 模块 | 类别 | 说明 |
+|------|------|------|
+| session_hijack | DataLeak | sessions.preview IDOR + 跨会话注入 |
+| transcript_theft | DataLeak | 会话记录窃取 |
+| memory_data_leak | DataLeak | 内存数据泄露 |
+| c2_exfil | DataLeak | C2 数据外泄 |
+| browser_upload_traversal | RCE | 浏览器上传路径穿越 |
+| secret_exec_abuse | RCE | 密钥执行滥用 |
+| bypass_soul | Injection | Soul 绕过 |
+| marker_spoof | Injection | 标记欺骗 |
+| redact_bypass | DataLeak | 脱敏绕过 |
+| obfuscation_bypass | Injection | 混淆绕过 |
+| unicode_bypass | Injection | Unicode 绕过 |
+| ratelimit_scope_bypass | Config | 速率限制范围绕过 |
+| flood_guard_reset | Config | 洪水防护重置 |
+| webhook_verify | Config | Webhook 验证绕过 |
+| skill_scanner_bypass | Config | Skill 扫描器绕过 |
+
+---
+
+## DAG 攻击链架构
+
+```
+                        ┌─────────────────────┐
+                        │   Level 0 (Recon)    │
+                        │  CORS / WS / Auth    │
+                        └─────────┬───────────┘
+                                  │
+              ┌───────────────────┼───────────────────┐
+              ▼                   ▼                   ▼
+    ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+    │  Level 1 (Init) │ │ Level 1 (Cred)  │ │  Level 1 (Init) │
+    │ SSRF / Eval /   │ │ APIKey / OAuth  │ │ Prompt / MCP /  │
+    │ Pairing         │ │ Token Theft     │ │ Responses       │
+    └────────┬────────┘ └────────┬────────┘ └────────┬────────┘
+             │                   │                   │
+             └───────────────────┼───────────────────┘
+                                 ▼
+                   ┌─────────────────────────┐
+                   │   Level 2 (Execution)   │
+                   │  RCE / Hook / Tools /   │
+                   │  Session Write          │
+                   └────────────┬────────────┘
+                                │
+                   ┌────────────┼────────────┐
+                   ▼                         ▼
+         ┌─────────────────┐       ┌─────────────────┐
+         │ Level 3 (Persis)│       │ Level 3 (Priv)  │
+         │ Agent / Cron /  │       │ Approval / Node │
+         │ Skill Poison    │       │ Config Tamper    │
+         └────────┬────────┘       └────────┬────────┘
+                  │                         │
+                  └────────────┬────────────┘
+                               ▼
+                  ┌─────────────────────────┐
+                  │   Level 4 (Exfil)       │
+                  │  C2 / Transcript /      │
+                  │  Memory Leak            │
+                  └─────────────────────────┘
+```
+
+**执行特性：**
+- Kahn 拓扑排序 → 按层级并发执行
+- `Semaphore` 控制最大并发数
+- `depends_on` — 前驱节点必须完成
+- `fallback_for` — 父节点有发现则跳过回退节点
+- `condition` — 按前序结果条件执行
+- `AttackGraph` — 记录每个节点执行/跳过/回退状态，导出 Mermaid 图
+
+---
+
+## Nuclei 模板
+
+`nuclei-templates/` 包含 45+ 个独立 Nuclei 兼容 YAML 模板：
+
+```bash
+# 扫描单目标
+nuclei -t nuclei-templates/ -u http://目标IP:端口
+
+# 扫描目标列表
+nuclei -t nuclei-templates/ -l targets.txt
+
+# 仅 Critical
+nuclei -t nuclei-templates/ -u http://目标IP:端口 -severity critical
+```
+
+---
 
 ## 项目结构
 
 ```
 catchclaw/
 ├── rust/
-│   ├── Cargo.toml                # 项目配置
-│   ├── Cargo.lock
+│   ├── Cargo.toml                 # 项目配置
 │   └── src/
-│       ├── main.rs               # CLI 入口 (clap)
-│       ├── chain/                # DAG 攻击链编排引擎
-│       │   ├── dag.rs            # DAG 执行器 + 拓扑排序
-│       │   └── chains.rs         # 59 条攻击链定义
-│       ├── config/               # 全局配置 + 协议常量
-│       ├── exploit/              # 59 个 Exploit 模块
-│       │   ├── base.rs           # ExploitCtx + Trait 定义
-│       │   ├── registry.rs       # 自动注册宏
-│       │   └── *.rs              # 各模块实现
-│       ├── scan/                 # 扫描编排器
-│       ├── report/               # JSON 报告生成
-│       └── utils/                # HTTP/WS 客户端, 类型定义
-├── scripts/
-│   └── gen_dag_chains.py         # DAG 链生成脚本
-├── LICENSE                           # CatchClaw Strict Non-Commercial License v2.0
+│       ├── main.rs                # CLI 入口 (clap derive)
+│       ├── config/mod.rs          # AppConfig + 协议常量
+│       ├── chain/
+│       │   ├── dag.rs             # DAG 引擎 (拓扑排序 + 并发 + AttackGraph)
+│       │   └── chains.rs          # 59 条攻击链节点定义
+│       ├── exploit/
+│       │   ├── registry.rs        # ExploitMeta + inventory 注册系统
+│       │   ├── base.rs            # ExploitCtx 公共上下文
+│       │   └── *.rs               # 59 个 exploit 模块实现
+│       ├── scan/mod.rs            # 全量扫描编排
+│       ├── report/mod.rs          # JSON 报告输出
+│       └── utils/
+│           ├── types.rs           # Target / Finding / Severity / ScanResult
+│           ├── http.rs            # HTTP 客户端 + 误报过滤器
+│           └── ws.rs              # GatewayWsClient (WS + challenge)
+├── nuclei-templates/              # 45+ Nuclei YAML 模板
+├── scripts/gen_dag_chains.py      # DAG 链生成辅助脚本
+├── LICENSE                        # CatchClaw Strict Non-Commercial License v2.0
 └── README.md
 ```
 
