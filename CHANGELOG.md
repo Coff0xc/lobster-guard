@@ -4,7 +4,7 @@ All notable changes to CatchClaw will be documented in this file.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [5.1.0] - 2026-03-24
 
 ### Added
 - **Multi-target scanning** — CIDR notation (/24, /16), IP range (start-end), comma-separated targets, target file (`-f targets.txt`)
