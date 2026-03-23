@@ -59,8 +59,9 @@
 │                          CatchClaw v5.0.0                                │
 ├────────────────────────────────────────────────────────────────────────────┤
 │  ● 59 条 DAG 攻击链     ● 59 个 Exploit 模块    ● Async Tokio 引擎       │
-│  ● ATT&CK 9阶段映射    ● Mermaid 攻击图导出    ● JSON 报告生成           │
+│  ● ATT&CK 9阶段映射    ● Mermaid 攻击图导出    ● JSON/HTML/MD 报告       │
 │  ● Kahn 拓扑排序引擎    ● Semaphore 并发控制    ● 条件/回退执行           │
+│  ● 多目标扫描 (CIDR)   ● 端口扫描/服务发现     ● 200+ 外部 Payload       │
 ├────────────────────────────────────────────────────────────────────────────┤
 │  攻击面: Gateway WS API | HTTP REST | OAuth | Webhook | Node Pairing     │
 │  覆盖: SSRF | RCE | 密钥窃取 | 会话劫持 | 提权 | 持久化 | 数据泄露      │
@@ -98,8 +99,10 @@
 | **漏洞验证** | 逐个手写 PoC | 59 条链自动编排验证 |
 | **攻击面覆盖** | 靠经验判断 | WS + HTTP + OAuth + Webhook + Node 全覆盖 |
 | **依赖链发现** | 难以追踪 | DAG 自动发现漏洞依赖路径 |
-| **结果可视化** | 手工整理 | Mermaid 攻击图 + JSON 报告 |
+| **结果可视化** | 手工整理 | Mermaid 攻击图 + JSON/HTML/Markdown 报告 |
 | **CI/CD 集成** | 无 | 24 Nuclei 模板即插即用 |
+| **多目标扫描** | 逐个手动测试 | CIDR、IP 范围、目标文件批量扫描 |
+| **服务发现** | 需配合 nmap | 内置端口扫描 + OpenClaw 指纹识别 |
 
 ---
 
@@ -126,7 +129,31 @@
 - **HTTP REST** — 禁用重定向防止 OAuth 302 误报
 - **误报消除** — challenge 页面 / SPA 回退 / LLM 拒绝检测
 - **TLS 支持** — rustls 后端，`--tls` 启用 HTTPS/WSS
-- **JSON 报告** — 结构化输出，按严重级别分类
+- **多格式报告** — JSON + HTML（暗色主题）+ Markdown
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+### 扫描增强
+
+- **多目标扫描** — CIDR (/24)、IP 范围、逗号分隔、目标文件
+- **端口扫描** — TCP connect 扫描 + 自定义端口范围
+- **服务发现** — OpenClaw 指纹识别（API/WebSocket/健康检查）
+- **200+ Payload** — SSRF/注入/Prompt/Auth/XSS 外部 YAML 库
+- **扫描配置** — TOML 配置文件 + Profile 预设 + 代理支持
+
+</td>
+<td width="50%">
+
+### CLI 体验
+
+- **`--profile`** — 使用预设扫描配置（quick/stealth/full）
+- **`--severity-filter`** — 按严重级别过滤结果
+- **`--format`** — 选择输出格式：json/html/markdown
+- **`--dry-run`** — 预览 DAG 执行计划，不实际扫描
+- **`--targets-file`** — 批量目标文件输入
 
 </td>
 </tr>
@@ -170,6 +197,24 @@ catchclaw scan -t 目标IP:端口
 # 扫描并输出 JSON 报告
 catchclaw scan -t 目标IP:端口 -o report.json
 
+# 输出 HTML 报告
+catchclaw scan -t 目标IP:端口 -o report.html --format html
+
+# 多目标扫描 (CIDR)
+catchclaw scan --targets "192.168.1.0/24:8080"
+
+# 从文件批量扫描
+catchclaw scan -f targets.txt -o results.json
+
+# 使用 Profile 预设
+catchclaw scan -t 目标IP:端口 --profile stealth
+
+# 仅显示高危结果
+catchclaw scan -t 目标IP:端口 --severity-filter critical,high
+
+# 预览执行计划
+catchclaw scan -t 目标IP:端口 --dry-run
+
 # 带 Token 扫描
 catchclaw scan -t 目标IP:端口 --token "your-gateway-token"
 
@@ -193,15 +238,23 @@ Commands:
   scan      全量安全扫描（构建 DAG → 执行 → 汇总）
   exploit   执行攻击链（完整 DAG 或单节点）
   list      列出所有注册的 Exploit 模块
+  config    显示当前配置
 
 Scan Flags:
-  -t, --target <HOST:PORT>     目标地址
-      --token <TOKEN>          Gateway Token (或 CATCHCLAWGUARD_TOKEN 环境变量)
+  -t, --target <HOST:PORT>     目标地址（单目标）
+      --targets <SPEC>         多目标：逗号分隔、CIDR 或 IP 范围
+  -f, --targets-file <FILE>    目标文件（每行一个 host:port）
+      --token <TOKEN>          Gateway Token (或 CATCHCLAW_TOKEN 环境变量)
       --timeout <SECS>         请求超时秒数 (默认 10)
-  -o, --output <FILE>          JSON 报告输出路径
+  -o, --output <FILE>          报告输出路径
+      --format <FMT>           输出格式：json | html | markdown (默认 json)
       --concurrency <N>        最大并发数 (默认 10)
       --tls                    使用 HTTPS/WSS
       --callback <URL>         SSRF 回调地址
+      --profile <NAME>         使用配置文件中的 Profile 预设
+      --severity-filter <SEV>  按严重级别过滤：critical,high,medium,low,info
+      --dry-run                预览 DAG 执行计划
+      --config <FILE>          配置文件路径 (TOML/YAML/JSON)
 
 Exploit Flags:
   -t, --target <HOST:PORT>     目标地址
@@ -389,22 +442,30 @@ catchclaw/
 │   ├── Cargo.toml                 # 项目配置
 │   └── src/
 │       ├── main.rs                # CLI 入口 (clap derive)
-│       ├── config/mod.rs          # AppConfig + 协议常量
+│       ├── config/mod.rs          # AppConfig + Profile + 协议常量
 │       ├── chain/
 │       │   ├── dag.rs             # DAG 引擎 (拓扑排序 + 并发 + AttackGraph)
 │       │   └── chains.rs          # 59 条攻击链节点定义
 │       ├── exploit/
 │       │   ├── registry.rs        # ExploitMeta + inventory 注册系统
-│       │   ├── base.rs            # ExploitCtx 公共上下文
+│       │   ├── base.rs            # ExploitCtx 公共上下文 + PayloadRegistry 集成
 │       │   └── *.rs               # 59 个 exploit 模块实现
-│       ├── scan/mod.rs            # 全量扫描编排
-│       ├── report/mod.rs          # JSON 报告输出
+│       ├── scan/mod.rs            # 全量扫描 + 多目标扫描编排
+│       ├── report/mod.rs          # JSON / HTML / Markdown 报告输出
 │       └── utils/
-│           ├── types.rs           # Target / Finding / Severity / ScanResult
+│           ├── types.rs           # Target / Finding / Severity / 多目标解析
 │           ├── http.rs            # HTTP 客户端 + 误报过滤器
-│           └── ws.rs              # GatewayWsClient (WS + challenge)
+│           ├── ws.rs              # GatewayWsClient (WS + challenge)
+│           ├── discovery.rs       # 端口扫描 + OpenClaw 服务发现
+│           ├── payload.rs         # PayloadRegistry (YAML 加载 + 目录合并)
+│           └── mutate.rs          # Payload 变异引擎
+├── payloads/                      # 200+ 外部 Payload (YAML)
+│   ├── ssrf.yaml                  # SSRF: AWS/GCP/Azure/IP绕过/协议走私
+│   ├── injection.yaml             # 命令注入/Shell元字符/编码绕过
+│   ├── prompt_inject.yaml         # Prompt注入/越狱/角色覆盖
+│   ├── auth_bypass.yaml           # Token/Header/路径穿越/默认凭证
+│   └── xss.yaml                   # XSS: 反射/事件/过滤绕过/Polyglot
 ├── nuclei-templates/              # 24 Nuclei YAML 模板
-├── scripts/gen_dag_chains.py      # DAG 链生成辅助脚本
 ├── LICENSE                        # CatchClaw Strict Non-Commercial License v2.0
 └── README.md
 ```

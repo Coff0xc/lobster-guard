@@ -59,8 +59,9 @@
 │                          CatchClaw v5.0.0                                │
 ├────────────────────────────────────────────────────────────────────────────┤
 │  ● 59 DAG Attack Chains  ● 59 Exploit Modules   ● Async Tokio Engine    │
-│  ● ATT&CK 9-Phase Map   ● Mermaid Attack Graph  ● JSON Report Output    │
+│  ● ATT&CK 9-Phase Map   ● Mermaid Attack Graph  ● JSON/HTML/MD Reports  │
 │  ● Kahn Topological Sort ● Semaphore Concurrency ● Condition/Fallback    │
+│  ● Multi-Target (CIDR)  ● Port Scan / Discovery ● 200+ External Payloads│
 ├────────────────────────────────────────────────────────────────────────────┤
 │  Attack Surface: Gateway WS API | HTTP REST | OAuth | Webhook | Node     │
 │  Coverage: SSRF | RCE | Key Theft | Session Hijack | Privesc | Persist   │
@@ -98,8 +99,10 @@ Built on Tokio async runtime, the DAG engine uses Kahn's topological sort for le
 | **Vulnerability Validation** | Write PoCs one by one | 59 chains with automated orchestration |
 | **Attack Surface Coverage** | Experience-dependent | WS + HTTP + OAuth + Webhook + Node full coverage |
 | **Dependency Chain Discovery** | Hard to track | DAG auto-discovers vulnerability dependency paths |
-| **Result Visualization** | Manual compilation | Mermaid attack graph + JSON report |
+| **Result Visualization** | Manual compilation | Mermaid attack graph + JSON/HTML/Markdown report |
 | **CI/CD Integration** | None | 24 Nuclei templates plug-and-play |
+| **Multi-Target Scanning** | Test one at a time | CIDR, IP range, target file batch scanning |
+| **Service Discovery** | Requires nmap | Built-in port scan + OpenClaw fingerprinting |
 
 ---
 
@@ -126,7 +129,31 @@ Built on Tokio async runtime, the DAG engine uses Kahn's topological sort for le
 - **HTTP REST** — Redirect following disabled to prevent OAuth 302 false positives
 - **False Positive Elimination** — Challenge page / SPA fallback / LLM refusal detection
 - **TLS Support** — rustls backend, `--tls` enables HTTPS/WSS
-- **JSON Reports** — Structured output, severity-classified findings
+- **Multi-Format Reports** — JSON + HTML (dark theme) + Markdown
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+### Scanning Enhancements
+
+- **Multi-Target Scanning** — CIDR (/24), IP range, comma-separated, target file
+- **Port Scanning** — TCP connect scan + custom port ranges
+- **Service Discovery** — OpenClaw fingerprinting (API/WebSocket/health)
+- **200+ Payloads** — SSRF/Injection/Prompt/Auth/XSS external YAML library
+- **Scan Config** — TOML config file + Profile presets + proxy support
+
+</td>
+<td width="50%">
+
+### CLI Experience
+
+- **`--profile`** — Use preset scan configs (quick/stealth/full)
+- **`--severity-filter`** — Filter results by severity level
+- **`--format`** — Output format: json/html/markdown
+- **`--dry-run`** — Preview DAG execution plan without scanning
+- **`--targets-file`** — Batch target file input
 
 </td>
 </tr>
@@ -170,6 +197,24 @@ catchclaw scan -t TARGET_IP:PORT
 # Scan with JSON report output
 catchclaw scan -t TARGET_IP:PORT -o report.json
 
+# HTML report output
+catchclaw scan -t TARGET_IP:PORT -o report.html --format html
+
+# Multi-target scan (CIDR)
+catchclaw scan --targets "192.168.1.0/24:8080"
+
+# Batch scan from file
+catchclaw scan -f targets.txt -o results.json
+
+# Use a scan profile
+catchclaw scan -t TARGET_IP:PORT --profile stealth
+
+# Show only critical/high findings
+catchclaw scan -t TARGET_IP:PORT --severity-filter critical,high
+
+# Preview execution plan
+catchclaw scan -t TARGET_IP:PORT --dry-run
+
 # Scan with authentication token
 catchclaw scan -t TARGET_IP:PORT --token "your-gateway-token"
 
@@ -193,15 +238,23 @@ Commands:
   scan      Full security scan (build DAG → execute → summarize)
   exploit   Execute attack chains (full DAG or single node)
   list      List all registered exploit modules
+  config    Show current configuration
 
 Scan Flags:
-  -t, --target <HOST:PORT>     Target address
-      --token <TOKEN>          Gateway Token (or CATCHCLAWGUARD_TOKEN env var)
+  -t, --target <HOST:PORT>     Target address (single target)
+      --targets <SPEC>         Multi-target: comma-separated, CIDR, or IP range
+  -f, --targets-file <FILE>    Target file (one host:port per line)
+      --token <TOKEN>          Gateway Token (or CATCHCLAW_TOKEN env var)
       --timeout <SECS>         Request timeout in seconds (default 10)
-  -o, --output <FILE>          JSON report output path
+  -o, --output <FILE>          Report output path
+      --format <FMT>           Output format: json | html | markdown (default json)
       --concurrency <N>        Max concurrent workers (default 10)
       --tls                    Use HTTPS/WSS
       --callback <URL>         SSRF callback URL
+      --profile <NAME>         Use a profile from config file
+      --severity-filter <SEV>  Filter by severity: critical,high,medium,low,info
+      --dry-run                Preview DAG execution plan
+      --config <FILE>          Config file path (TOML/YAML/JSON)
 
 Exploit Flags:
   -t, --target <HOST:PORT>     Target address
@@ -389,22 +442,30 @@ catchclaw/
 │   ├── Cargo.toml                 # Project configuration
 │   └── src/
 │       ├── main.rs                # CLI entry point (clap derive)
-│       ├── config/mod.rs          # AppConfig + protocol constants
+│       ├── config/mod.rs          # AppConfig + profiles + protocol constants
 │       ├── chain/
 │       │   ├── dag.rs             # DAG engine (topo sort + concurrency + AttackGraph)
 │       │   └── chains.rs          # 59 attack chain node definitions
 │       ├── exploit/
 │       │   ├── registry.rs        # ExploitMeta + inventory registration system
-│       │   ├── base.rs            # ExploitCtx shared context
+│       │   ├── base.rs            # ExploitCtx shared context + PayloadRegistry
 │       │   └── *.rs               # 59 exploit module implementations
-│       ├── scan/mod.rs            # Full scan orchestration
-│       ├── report/mod.rs          # JSON report output
+│       ├── scan/mod.rs            # Full scan + multi-target orchestration
+│       ├── report/mod.rs          # JSON / HTML / Markdown report output
 │       └── utils/
-│           ├── types.rs           # Target / Finding / Severity / ScanResult
+│           ├── types.rs           # Target / Finding / Severity / multi-target parsing
 │           ├── http.rs            # HTTP client + false positive filters
-│           └── ws.rs              # GatewayWsClient (WS + challenge detection)
+│           ├── ws.rs              # GatewayWsClient (WS + challenge detection)
+│           ├── discovery.rs       # Port scanning + OpenClaw service discovery
+│           ├── payload.rs         # PayloadRegistry (YAML loading + directory merge)
+│           └── mutate.rs          # Payload mutation engine
+├── payloads/                      # 200+ external payloads (YAML)
+│   ├── ssrf.yaml                  # SSRF: AWS/GCP/Azure/IP bypass/protocol smuggling
+│   ├── injection.yaml             # Command injection/shell metachar/encoding bypass
+│   ├── prompt_inject.yaml         # Prompt injection/jailbreak/role override
+│   ├── auth_bypass.yaml           # Token/header/path traversal/default creds
+│   └── xss.yaml                   # XSS: reflected/event/filter bypass/polyglot
 ├── nuclei-templates/              # 24 Nuclei YAML templates
-├── scripts/gen_dag_chains.py      # DAG chain generation helper
 ├── LICENSE                        # CatchClaw Strict Non-Commercial License v2.0
 └── README.md
 ```

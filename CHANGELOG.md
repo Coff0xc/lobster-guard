@@ -7,12 +7,22 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
-- External YAML payload file loading via `PayloadRegistry`
+- **Multi-target scanning** — CIDR notation (/24, /16), IP range (start-end), comma-separated targets, target file (`-f targets.txt`)
+- **Port scanning & service discovery** — TCP connect scan with OpenClaw fingerprinting across common ports (80, 443, 3000, 8080, etc.)
+- **Comprehensive payload library** — 5 external YAML files with 200+ payloads: SSRF (AWS/GCP/Azure/DO metadata, IP bypass, protocol smuggling), command injection, prompt injection (DAN, jailbreak, extraction), auth bypass, XSS
+- **PayloadRegistry directory loading** — `from_directory()` merges all YAML files from `payloads/` folder
+- **ExploitCtx payload integration** — `get_payloads(category)` helper for exploit modules to use external payloads
+- **CLI `--profile`** — select scan presets from `[profile.NAME]` in catchclaw.toml (quick/stealth/full)
+- **CLI `--severity-filter`** — filter results by severity (e.g., `--severity-filter critical,high`)
+- **CLI `--format`** — output format selection: json, html, markdown
+- **CLI `--dry-run`** — preview which exploits would execute per DAG level without scanning
+- **Scan config summary box** — configuration overview displayed before scan starts
+- **Improved `list` output** — numbered table with aligned columns for exploit modules
 - TOML profile mechanism for scan presets (quick/full/stealth)
 - HTML report generation (dark-themed, self-contained) and Markdown report output
 - Release CI workflow for automated multi-platform builds (Linux/macOS/Windows)
 - `rustfmt --check` and `cargo-audit` security scanning in CI pipeline
-- 53 new unit tests (38 → 91 total)
+- 72 new unit tests (38 → 110 total)
 
 ### Fixed
 - MinGW linker failure on paths containing CJK/bracket characters
