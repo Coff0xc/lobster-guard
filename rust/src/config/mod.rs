@@ -69,8 +69,10 @@ pub struct ProxyConfig {
 #[derive(Debug, Clone, Default, serde::Deserialize)]
 pub struct GraphConfig {
     /// Export attack graph as Mermaid
+    #[serde(default)]
     pub export_mermaid: bool,
     /// Export attack graph as JSON
+    #[serde(default)]
     pub export_json: bool,
     /// Output directory for graph files
     pub output_dir: Option<PathBuf>,

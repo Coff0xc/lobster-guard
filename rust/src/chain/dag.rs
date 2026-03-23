@@ -534,7 +534,7 @@ mod tests {
             phase: "Test".into(),
             depends_on: deps,
             fallback_for: None,
-            execute: Box::new(|_t, _c| Box::pin(async { vec![] })),
+            execute: Box::new(|_t, _c| Box::pin(async { (vec![], ExploitOutcome::Clean(String::new())) })),
             condition: None,
         }
     }
@@ -610,36 +610,36 @@ mod tests {
     #[test]
     fn has_any_finding_true() {
         let mut r = HashMap::new();
-        r.insert(0, vec![Finding::new("t", "m", "x", Severity::Low, "d")]);
+        r.insert(0, (vec![Finding::new("t", "m", "x", Severity::Low, "d")], ExploitOutcome::Success(String::new())));
         assert!(has_any_finding(&r));
     }
 
     #[test]
     fn has_any_finding_false() {
-        let mut r: HashMap<u32, Vec<Finding>> = HashMap::new();
-        r.insert(0, vec![]);
+        let mut r: HashMap<u32, (Vec<Finding>, ExploitOutcome)> = HashMap::new();
+        r.insert(0, (vec![], ExploitOutcome::Clean(String::new())));
         assert!(!has_any_finding(&r));
     }
 
     #[test]
     fn has_critical_or_high_true() {
         let mut r = HashMap::new();
-        r.insert(0, vec![Finding::new("t", "m", "x", Severity::High, "d")]);
+        r.insert(0, (vec![Finding::new("t", "m", "x", Severity::High, "d")], ExploitOutcome::Success(String::new())));
         assert!(has_critical_or_high(&r));
     }
 
     #[test]
     fn has_critical_or_high_false() {
         let mut r = HashMap::new();
-        r.insert(0, vec![Finding::new("t", "m", "x", Severity::Medium, "d")]);
+        r.insert(0, (vec![Finding::new("t", "m", "x", Severity::Medium, "d")], ExploitOutcome::Success(String::new())));
         assert!(!has_critical_or_high(&r));
     }
 
     #[test]
     fn node_has_findings_test() {
         let mut r = HashMap::new();
-        r.insert(5, vec![Finding::new("t", "m", "x", Severity::Low, "d")]);
-        r.insert(6, vec![]);
+        r.insert(5, (vec![Finding::new("t", "m", "x", Severity::Low, "d")], ExploitOutcome::Success(String::new())));
+        r.insert(6, (vec![], ExploitOutcome::Clean(String::new())));
         assert!(node_has_findings(&r, 5));
         assert!(!node_has_findings(&r, 6));
         assert!(!node_has_findings(&r, 99));

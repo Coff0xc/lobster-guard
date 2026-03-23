@@ -3,6 +3,7 @@
 use crate::chain::AttackGraph;
 use crate::config::GraphConfig;
 use crate::utils::{Finding, ScanResult};
+use colored::Colorize;
 use std::path::{Path, PathBuf};
 use thiserror::Error;
 

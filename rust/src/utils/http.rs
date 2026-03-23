@@ -182,7 +182,7 @@ mod tests {
     #[test]
     fn challenge_response_detects_markers() {
         assert!(is_challenge_response(
-            r#"{\"type\":\"challenge\",\"token\":\"abc\"}"#
+            r#"{"type":"challenge","token":"abc"}"#
         ));
         assert!(is_challenge_response("Welcome to connect.challenge gate"));
         assert!(is_challenge_response("X-Challenge-Token: abc123"));

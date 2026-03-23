@@ -230,7 +230,7 @@ mod tests {
         let result = PayloadMutator::mutate("AB", &MutationType::UnicodeHomoglyph);
         // A -> Greek Alpha, B -> Greek Beta
         assert_ne!(result, "AB");
-        assert_eq!(result.len(), 2);
+        assert_eq!(result.chars().count(), 2);
     }
 
     #[test]
