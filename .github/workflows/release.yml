@@ -33,6 +33,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Remove local cargo config
+        run: rm -f .cargo/config.toml
+
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
         with:
